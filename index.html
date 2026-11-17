@@ -101,7 +101,7 @@
   <div class="card">
     <h2>Siste hendelser</h2>
     <ul class="log-list" id="activityLog">
-      <li class="log-item">Ingen hendelser registrert ennå.</li>
+      <li class="log-item">Ingen hendelser registrert ennå.</li>Tom R
     </ul>
   </div>
 
@@ -129,18 +129,57 @@
     const nameInput = document.getElementById('userName');
     const savedNote = document.getElementById('savedNote');
 
-    // Hent lagret navn automatisk
+    function formatName(text, trimEnd = false) {
+      let cleaned = text
+        .toLowerCase()
+        .replace(/[^a-zæøå\s-]/g, '')
+        .replace(/^[\s-]+/, '')
+        .replace(/([\s-])[\s-]+/g, '$1');
+
+      if (trimEnd) {
+        cleaned = cleaned.replace(/[\s-]+$/, '');
+      }
+
+      return cleaned.replace(/(^|[\s-])([a-zæøå])/g, (match, separator, char) => separator + char.toUpperCase());
+    }
+
     const storedName = localStorage.getItem('zoneBoardUserName');
     if (storedName) {
-      nameInput.value = storedName;
-      savedNote.textContent = "✓ Navnet ditt er husket på denne enheten";
+      const formattedStored = formatName(storedName, true);
+      nameInput.value = formattedStored;
+      if (formattedStored) {
+        localStorage.setItem('zoneBoardUserName', formattedStored);
+        savedNote.textContent = "✓ Navnet ditt er husket på denne enheten";
+      } else {
+        localStorage.removeItem('zoneBoardUserName');
+      }
     }
 
     nameInput.addEventListener('input', () => {
-      const currentName = nameInput.value.trim();
-      if (currentName) {
-        localStorage.setItem('zoneBoardUserName', currentName);
+      const originalLength = nameInput.value.length;
+      const cursorPosition = nameInput.selectionStart;
+      const formattedValue = formatName(nameInput.value, false);
+      
+      nameInput.value = formattedValue;
+      const lengthDiff = originalLength - formattedValue.length;
+      const newCursorPos = Math.max(0, cursorPosition - lengthDiff);
+      nameInput.setSelectionRange(newCursorPos, newCursorPos);
+
+      const cleanName = formatName(formattedValue, true);
+      if (cleanName) {
+        localStorage.setItem('zoneBoardUserName', cleanName);
         savedNote.textContent = "✓ Navn lagret på denne enheten";
+      } else {
+        localStorage.removeItem('zoneBoardUserName');
+        savedNote.textContent = "";
+      }
+    });
+
+    nameInput.addEventListener('blur', () => {
+      const cleanName = formatName(nameInput.value, true);
+      nameInput.value = cleanName;
+      if (cleanName) {
+        localStorage.setItem('zoneBoardUserName', cleanName);
       } else {
         localStorage.removeItem('zoneBoardUserName');
         savedNote.textContent = "";
@@ -161,17 +200,17 @@
     }
 
     window.toggleZone = function(zoneKey, newStatus) {
-      const user = nameInput.value.trim();
+      const user = formatName(nameInput.value, true);
       if (!user) {
-        alert("Vennligst skriv inn navnet ditt først!");
+        alert("Vennligst skriv inn navnet ditt først (kun bokstaver)!");
         nameInput.focus();
         return;
       }
+      nameInput.value = user;
       localStorage.setItem('zoneBoardUserName', user);
       const timestamp = formatDateTime();
       const zoneName = defaultZones[zoneKey].name;
 
-      // Oppdater sonestatus
       set(ref(db, 'zones/' + zoneKey), {
         name: zoneName,
         status: newStatus,
@@ -179,7 +218,6 @@
         time: timestamp
       });
 
-      // Legg til i hendelsesloggen
       push(ref(db, 'history'), {
         zone: zoneName,
         status: newStatus,
@@ -188,7 +226,6 @@
       });
     };
 
-    // Lytt etter oppdateringer på sonene
     onValue(zonesRef, (snapshot) => {
       const data = snapshot.val() || defaultZones;
       const container = document.getElementById('zonesContainer');
@@ -213,7 +250,6 @@
       });
     });
 
-    // Lytt etter de 100 siste hendelsene
     onValue(historyRef, (snapshot) => {
       const logContainer = document.getElementById('activityLog');
       if (!snapshot.exists()) {
