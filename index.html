@@ -16,10 +16,11 @@
       color: #0f172a; 
     }
     .card { 
-      background: rgba(255, 255, 255, 0.96); 
+      background: #ffffff; 
       padding: 18px; 
       border-radius: 14px; 
-      box-shadow: 0 4px 12px rgba(74, 20, 32, 0.15); 
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06); 
       margin-bottom: 16px; 
     }
     h2 { margin: 0 0 12px 0; font-size: 18px; font-weight: 700; color: #1e293b; }
@@ -32,7 +33,7 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    input[type="text"]:focus { border-color: #80263a; }
+    input[type="text"]:focus { border-color: #64748b; }
     .saved-note { font-size: 13px; color: #15803d; margin-top: 8px; font-weight: 500; }
     
     /* Sonekort for mobil */
@@ -108,14 +109,14 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-    import { getDatabase, ref, set, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+    import { initializeApp } from "https://gstatic.com";
+    import { getDatabase, ref, set, push, onValue, query, limitToLast } from "https://gstatic.com";
 
     // LIM INN DIN FIREBASE-URL UNDER (Uten skråstrek på slutten)
     const firebaseConfig = {
       apiKey: "AIzaSyCQfhH5J5iQ06uCNhzciV1P7w1f8uOuZeM",
-      authDomain: "dv14bg.firebaseapp.com",
-      databaseURL: "https://dv14bg-default-rtdb.europe-west1.firebasedatabase.app",
+      authDomain: "://firebaseapp.com",
+      databaseURL: "https://firebasedatabase.app",
       projectId: "dv14bg",
       storageBucket: "dv14bg.firebasestorage.app",
       messagingSenderId: "820368557888",
