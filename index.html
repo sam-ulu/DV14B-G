@@ -57,12 +57,27 @@
     .btn-on { background: #16a34a; color: white; }
     .btn-off { background: #dc2626; color: white; }
     .btn-inactive { background: #94a3b8; color: #f8fafc; }
-    .log-list { list-style: none; padding: 0; margin: 0; max-height: 640px; overflow-y: auto; }
-    .log-item { padding: 12px 0; border-bottom: 1px solid #e2e8f0; font-size: 14px; line-height: 1.4; }
+    .log-list { list-style: none; padding: 0; margin: 0; max-height: 530px; overflow-y: auto; }
+    .log-item { 
+      padding: 12px 0; 
+      border-bottom: 1px solid #e2e8f0; 
+      font-size: 14px; 
+      line-height: 1.4;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+    }
     .log-item:last-child { border-bottom: none; padding-bottom: 0; }
     .text-on { color: #16a34a; font-weight: 700; }
     .text-off { color: #dc2626; font-weight: 700; }
-    .log-time { color: #64748b; font-size: 12px; display: block; margin-top: 3px; }
+    .log-time { 
+      color: #64748b; 
+      font-size: 12px; 
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-right:16px;
+    }
   </style>
 </head>
 <body>
@@ -88,12 +103,11 @@
       <li class="log-item">Ingen endringer registrert ennå.</li>
     </ul>
   </div>
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getDatabase, ref, set, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
 
-    const accessPin = "0776";
+    const accessPin = "1234";
 
     // LIM INN DIN FIREBASE-URL UNDER (Uten skråstrek på slutten)
     const firebaseConfig = {
@@ -195,7 +209,7 @@
 
     const defaultZones = {
       zone1: { name: "Øverst", status: "OFF", updatedBy: "System", time: "" },
-      zone2: { name: "Midten", status: "OFF", updatedBy: "System", time: "" },
+      zone2: { name: "Midt", status: "OFF", updatedBy: "System", time: "" },
       zone3: { name: "Nederst", status: "OFF", updatedBy: "System", time: "" }
     };
 
@@ -261,8 +275,10 @@
         const isOn = item.status === "ON";
         return `
           <li class="log-item">
-            <strong>${item.user || 'Ukjent'}</strong> slo <strong>${item.zone || 'Sone'}</strong> 
-            <span class="${isOn ? 'text-on' : 'text-off'}">${isOn ? "PÅ" : "AV"}</span>
+            <span>
+              <strong>${item.user || 'Ukjent'}</strong> slo <strong>${item.zone || 'Sone'}</strong> 
+              <span class="${isOn ? 'text-on' : 'text-off'}">${isOn ? "PÅ" : "AV"}</span>
+            </span>
             <span class="log-time">${item.time || ''}</span>
           </li>`;
       }).join('');
