@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Status varmekabler tilfartsvei</title>
+  <title>Varmekabler tilfartsvei</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { 
@@ -15,6 +15,13 @@
       min-height: 100vh;
       color: #0f172a; 
     }
+    .top-grid {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .top-grid .card { margin-bottom: 0; }
     .card { 
       background: #ffffff; 
       padding: 18px; 
@@ -24,59 +31,32 @@
       margin-bottom: 16px; 
     }
     h2 { margin: 0 0 12px 0; font-size: 18px; font-weight: 700; color: #1e293b; }
-    input[type="text"] { 
+    input[type="text"], input[type="password"] { 
       width: 100%; 
       padding: 14px; 
       font-size: 16px; 
-      font-weight: 700;
-      color: #2563eb;
       border: 2px solid #cbd5e1; 
       border-radius: 10px; 
       outline: none;
       transition: border-color 0.2s;
     }
-    input[type="text"]::placeholder {
-      color: #94a3b8;
-      font-weight: 400;
-    }
-    input[type="text"]:focus { border-color: #64748b; }
+    #userName { font-weight: 700; color: #2563eb; }
+    #pinInput { font-weight: 400; color: #2563eb; }
+    input::placeholder { color: #94a3b8; font-weight: 400; }
+    input:focus { border-color: #64748b; }
     .saved-note { font-size: 13px; color: #15803d; margin-top: 8px; font-weight: 400; }
-    
-    /* Sonekort for mobil */
-    .zone { 
-      border: 1px solid #e2e8f0; 
-      border-radius: 12px; 
-      padding: 14px; 
-      margin-bottom: 12px; 
-      background: #f8fafc;
-    }
+    .error-note { font-size: 13px; color: #dc2626; margin-top: 8px; font-weight: 400; }
+    .zone { border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-bottom: 12px; background: #f8fafc; }
     .zone:last-child { margin-bottom: 0; }
-    .zone-header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 6px; 
-    }
+    .zone-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .zone-title { font-size: 18px; font-weight: 700; }
     .meta { font-size: 13px; color: #475569; margin-bottom: 12px; }
-    
-    /* Store trykkvennlige knapper */
     .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    button { 
-      padding: 14px; 
-      border: none; 
-      border-radius: 10px; 
-      cursor: pointer; 
-      font-size: 16px; 
-      font-weight: 700; 
-      transition: transform 0.1s, background-color 0.2s;
-    }
+    button { padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 700; transition: transform 0.1s, background-color 0.2s; }
     button:active { transform: scale(0.97); }
     .btn-on { background: #16a34a; color: white; }
     .btn-off { background: #dc2626; color: white; }
     .btn-inactive { background: #94a3b8; color: #f8fafc; }
-
-    /* Aktivitetslogg */
     .log-list { list-style: none; padding: 0; margin: 0; max-height: 400px; overflow-y: auto; }
     .log-item { padding: 12px 0; border-bottom: 1px solid #e2e8f0; font-size: 14px; line-height: 1.4; }
     .log-item:last-child { border-bottom: none; padding-bottom: 0; }
@@ -86,28 +66,34 @@
   </style>
 </head>
 <body>
-
-  <div class="card">
-    <h2>Ditt navn</h2>
-    <input type="text" id="userName" placeholder="Skriv inn navnet ditt én gang...">
-    <div class="saved-note" id="savedNote"></div>
+  <div class="top-grid">
+    <div class="card">
+      <h2>Ditt fornavn</h2>
+      <input type="text" id="userName" autocomplete="name" placeholder="Skriv inn fornavnet ditt...">
+      <div class="saved-note" id="savedNote"></div>
+    </div>
+    <div class="card">
+      <h2>PIN</h2>
+      <input type="password" id="pinInput" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="Skriv inn PIN">
+      <div class="saved-note" id="pinNote"></div>
+    </div>
   </div>
-
   <div class="card" id="zonesContainer">
-    <h2>Status varmekabler tilfartsvei</h2>
+    <h2>Varmekabler tilfartsvei</h2>
     <p>Laster inn soner...</p>
   </div>
-
   <div class="card">
-    <h2>Siste hendelser</h2>
+    <h2>Siste endringer</h2>
     <ul class="log-list" id="activityLog">
-      <li class="log-item">Ingen hendelser registrert ennå.</li>Tom R
+      <li class="log-item">Ingen endringer registrert ennå.</li>
     </ul>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getDatabase, ref, set, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+
+    const accessPin = "0776";
 
     // LIM INN DIN FIREBASE-URL UNDER (Uten skråstrek på slutten)
     const firebaseConfig = {
@@ -128,6 +114,34 @@
 
     const nameInput = document.getElementById('userName');
     const savedNote = document.getElementById('savedNote');
+    const pinInput = document.getElementById('pinInput');
+    const pinNote = document.getElementById('pinNote');
+
+    function updatePinStatus(isFromStorage = false) {
+      const currentPin = pinInput.value;
+      if (currentPin === accessPin) {
+        localStorage.setItem('zoneBoardPin', currentPin);
+        pinNote.className = "saved-note";
+        pinNote.textContent = isFromStorage ? "✓" : "✓ Godkjent";
+      } else if (currentPin.length > 0) {
+        localStorage.removeItem('zoneBoardPin');
+        pinNote.className = "error-note";
+        pinNote.textContent = "Feil";
+      } else {
+        localStorage.removeItem('zoneBoardPin');
+        pinNote.textContent = "";
+      }
+    }
+
+    const storedPin = localStorage.getItem('zoneBoardPin');
+    if (storedPin === accessPin) {
+      pinInput.value = storedPin;
+      updatePinStatus(true);
+    } else {
+      localStorage.removeItem('zoneBoardPin');
+    }
+
+    pinInput.addEventListener('input', () => updatePinStatus(false));
 
     function formatName(text, trimEnd = false) {
       let cleaned = text
@@ -135,12 +149,8 @@
         .replace(/[^a-zæøå\s-]/g, '')
         .replace(/^[\s-]+/, '')
         .replace(/([\s-])[\s-]+/g, '$1');
-
-      if (trimEnd) {
-        cleaned = cleaned.replace(/[\s-]+$/, '');
-      }
-
-      return cleaned.replace(/(^|[\s-])([a-zæøå])/g, (match, separator, char) => separator + char.toUpperCase());
+      if (trimEnd) cleaned = cleaned.replace(/[\s-]+$/, '');
+      return cleaned.replace(/(^|[\s-])([a-zæøå])/g, (m, sep, char) => sep + char.toUpperCase());
     }
 
     const storedName = localStorage.getItem('zoneBoardUserName');
@@ -149,7 +159,7 @@
       nameInput.value = formattedStored;
       if (formattedStored) {
         localStorage.setItem('zoneBoardUserName', formattedStored);
-        savedNote.textContent = "✓ Navnet ditt er husket på denne enheten";
+        savedNote.textContent = "✓";
       } else {
         localStorage.removeItem('zoneBoardUserName');
       }
@@ -159,16 +169,14 @@
       const originalLength = nameInput.value.length;
       const cursorPosition = nameInput.selectionStart;
       const formattedValue = formatName(nameInput.value, false);
-      
       nameInput.value = formattedValue;
-      const lengthDiff = originalLength - formattedValue.length;
-      const newCursorPos = Math.max(0, cursorPosition - lengthDiff);
+      const newCursorPos = Math.max(0, cursorPosition - (originalLength - formattedValue.length));
       nameInput.setSelectionRange(newCursorPos, newCursorPos);
 
       const cleanName = formatName(formattedValue, true);
       if (cleanName) {
         localStorage.setItem('zoneBoardUserName', cleanName);
-        savedNote.textContent = "✓ Navn lagret på denne enheten";
+        savedNote.textContent = "✓ Lagret";
       } else {
         localStorage.removeItem('zoneBoardUserName');
         savedNote.textContent = "";
@@ -178,9 +186,8 @@
     nameInput.addEventListener('blur', () => {
       const cleanName = formatName(nameInput.value, true);
       nameInput.value = cleanName;
-      if (cleanName) {
-        localStorage.setItem('zoneBoardUserName', cleanName);
-      } else {
+      if (cleanName) localStorage.setItem('zoneBoardUserName', cleanName);
+      else {
         localStorage.removeItem('zoneBoardUserName');
         savedNote.textContent = "";
       }
@@ -202,8 +209,13 @@
     window.toggleZone = function(zoneKey, newStatus) {
       const user = formatName(nameInput.value, true);
       if (!user) {
-        alert("Vennligst skriv inn navnet ditt først (kun bokstaver)!");
+        alert("Vennligst skriv inn fornavnet ditt først!");
         nameInput.focus();
+        return;
+      }
+      if (pinInput.value !== accessPin) {
+        alert("Vennligst skriv inn riktig PIN først!");
+        pinInput.focus();
         return;
       }
       nameInput.value = user;
@@ -211,71 +223,54 @@
       const timestamp = formatDateTime();
       const zoneName = defaultZones[zoneKey].name;
 
-      set(ref(db, 'zones/' + zoneKey), {
-        name: zoneName,
-        status: newStatus,
-        updatedBy: user,
-        time: timestamp
-      });
-
-      push(ref(db, 'history'), {
-        zone: zoneName,
-        status: newStatus,
-        user: user,
-        time: timestamp
-      });
+      set(ref(db, 'zones/' + zoneKey), { name: zoneName, status: newStatus, updatedBy: user, time: timestamp });
+      push(ref(db, 'history'), { zone: zoneName, status: newStatus, user: user, time: timestamp });
     };
 
     onValue(zonesRef, (snapshot) => {
       const data = snapshot.val() || defaultZones;
       const container = document.getElementById('zonesContainer');
-      container.innerHTML = '<h2>Status varmekabler tilfartsvei</h2>';
-
+      container.innerHTML = '<h2>Varmekabler tilfartsvei</h2>';
       Object.keys(defaultZones).forEach((key) => {
         const z = data[key] || defaultZones[key];
         const isOn = z.status === "ON";
-
         container.innerHTML += `
           <div class="zone">
-            <div class="zone-header">
-              <span class="zone-title">${defaultZones[key].name}</span>
-            </div>
+            <div class="zone-header"><span class="zone-title">${defaultZones[key].name}</span></div>
             <div class="meta">Sist endret av <strong>${z.updatedBy}</strong> ${z.time ? '(' + z.time + ')' : ''}</div>
             <div class="btn-group">
               <button class="btn-on ${!isOn ? 'btn-inactive' : ''}" onclick="toggleZone('${key}', 'ON')">PÅ</button>
               <button class="btn-off ${isOn ? 'btn-inactive' : ''}" onclick="toggleZone('${key}', 'OFF')">AV</button>
             </div>
-          </div>
-        `;
+          </div>`;
       });
     });
 
     onValue(historyRef, (snapshot) => {
       const logContainer = document.getElementById('activityLog');
       if (!snapshot.exists()) {
-        logContainer.innerHTML = '<li class="log-item">Ingen hendelser registrert ennå.</li>';
+        logContainer.innerHTML = '<li class="log-item">Ingen endringer registrert ennå (tomt svar fra Firebase).</li>';
         return;
       }
-
       const entries = [];
       snapshot.forEach((child) => {
         entries.push(child.val());
       });
-
       entries.reverse();
-
       logContainer.innerHTML = entries.map(item => {
         const isOn = item.status === "ON";
-        const actionText = isOn ? "PÅ" : "AV";
         return `
           <li class="log-item">
-            <strong>${item.user}</strong> slo <strong>${item.zone}</strong> 
-            <span class="${isOn ? 'text-on' : 'text-off'}">${actionText}</span>
-            <span class="log-time">${item.time}</span>
-          </li>
-        `;
+            <strong>${item.user || 'Ukjent'}</strong> slo <strong>${item.zone || 'Sone'}</strong> 
+            <span class="${isOn ? 'text-on' : 'text-off'}">${isOn ? "PÅ" : "AV"}</span>
+            <span class="log-time">${item.time || ''}</span>
+          </li>`;
       }).join('');
+    }, (error) => {
+      const logContainer = document.getElementById('activityLog');
+      logContainer.innerHTML = `<li class="log-item" style="color: #dc2626; font-weight: bold;">Firebase-feil: ${error.message}</li>`;
     });
   </script>
+
 </body>
 </html>
