@@ -93,7 +93,7 @@
   </div>
 
   <div class="card">
-    <h2>Siste hendelser (50 siste)</h2>
+    <h2>Siste hendelser</h2>
     <ul class="log-list" id="activityLog">
       <li class="log-item">Ingen hendelser registrert ennå.</li>
     </ul>
@@ -118,7 +118,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const zonesRef = ref(db, 'zones');
-    const historyRef = query(ref(db, 'history'), limitToLast(50));
+    const historyRef = query(ref(db, 'history'), limitToLast(100));
 
     const nameInput = document.getElementById('userName');
     const savedNote = document.getElementById('savedNote');
@@ -199,15 +199,15 @@
             </div>
             <div class="meta">Sist endret av <strong>${z.updatedBy}</strong> ${z.time ? '(' + z.time + ')' : ''}</div>
             <div class="btn-group">
-              <button class="btn-on ${isOn ? 'btn-inactive' : ''}" onclick="toggleZone('${key}', 'ON')">PÅ</button>
-              <button class="btn-off ${!isOn ? 'btn-inactive' : ''}" onclick="toggleZone('${key}', 'OFF')">AV</button>
+              <button class="btn-on ${!isOn ? 'btn-inactive' : ''}" onclick="toggleZone('${key}', 'ON')">PÅ</button>
+              <button class="btn-off ${isOn ? 'btn-inactive' : ''}" onclick="toggleZone('${key}', 'OFF')">AV</button>
             </div>
           </div>
         `;
       });
     });
 
-    // Lytt etter de 50 siste hendelsene
+    // Lytt etter de 100 siste hendelsene
     onValue(historyRef, (snapshot) => {
       const logContainer = document.getElementById('activityLog');
       if (!snapshot.exists()) {
