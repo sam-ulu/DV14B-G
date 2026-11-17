@@ -71,12 +71,21 @@
     .log-item:last-child { border-bottom: none; padding-bottom: 0; }
     .text-on { color: #16a34a; font-weight: 700; }
     .text-off { color: #dc2626; font-weight: 700; }
-    .log-time { 
-      color: #64748b; 
-      font-size: 12px; 
+    .log-right {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
       white-space: nowrap;
       flex-shrink: 0;
       margin-right: 4px;
+    }
+    .log-user {
+      color: #1e293b;
+      font-weight: 600;
+    }
+    .log-time { 
+      color: #64748b; 
+      font-size: 12px; 
     }
   </style>
 </head>
@@ -104,12 +113,10 @@
     </ul>
   </div>
   <script type="module">
+
+    // NEDENFOR ER DET GJERNE LITT SOM MÅ ENDRES ETTER HJELP FRA AI
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getDatabase, ref, set, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
-
-    const accessPin = "0776";
-
-    // LIM INN DIN FIREBASE-URL UNDER (Uten skråstrek på slutten)
     const firebaseConfig = {
       apiKey: "AIzaSyCQfhH5J5iQ06uCNhzciV1P7w1f8uOuZeM",
       authDomain: "dv14bg.firebaseapp.com",
@@ -120,16 +127,17 @@
       appId: "1:820368557888:web:5a28d46ebc7950f6151ca5",
       measurementId: "G-5JV19DK8WT"
     };
+    // TIL HIT
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const zonesRef = ref(db, 'zones');
     const historyRef = query(ref(db, 'history'), limitToLast(100));
-
     const nameInput = document.getElementById('userName');
     const savedNote = document.getElementById('savedNote');
     const pinInput = document.getElementById('pinInput');
     const pinNote = document.getElementById('pinNote');
+    const accessPin = "0776";
 
     function updatePinStatus(isFromStorage = false) {
       const currentPin = pinInput.value;
@@ -275,11 +283,11 @@
         const isOn = item.status === "ON";
         return `
           <li class="log-item">
-            <span>
-              <strong>${item.user || 'Ukjent'}</strong> slo <strong>${item.zone || 'Sone'}</strong> 
-              <span class="${isOn ? 'text-on' : 'text-off'}">${isOn ? "PÅ" : "AV"}</span>
+            <span class="${isOn ? 'text-on' : 'text-off'}">${item.zone || 'Sone'}</span>
+            <span class="log-right">
+              <span class="log-user">${item.user || 'Ukjent'}</span>
+              <span class="log-time">${item.time || ''}</span>
             </span>
-            <span class="log-time">${item.time || ''}</span>
           </li>`;
       }).join('');
     }, (error) => {
