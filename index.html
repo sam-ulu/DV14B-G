@@ -17,7 +17,7 @@
     }
     .top-grid {
       display: grid;
-      grid-template-columns: 1.6fr 1fr;
+      grid-template-columns: 1.4fr 1fr;
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -68,13 +68,13 @@
 <body>
   <div class="top-grid">
     <div class="card">
-      <h2>Ditt fornavn</h2>
-      <input type="text" id="userName" autocomplete="name" placeholder="Skriv inn fornavnet ditt...">
+      <h2>Fornavn</h2>
+      <input type="text" id="userName" autocomplete="name" placeholder="Oppgi fornavn..">
       <div class="saved-note" id="savedNote"></div>
     </div>
     <div class="card">
       <h2>PIN</h2>
-      <input type="password" id="pinInput" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="Skriv inn PIN">
+      <input type="password" id="pinInput" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="Oppgi PIN">
       <div class="saved-note" id="pinNote"></div>
     </div>
   </div>
@@ -209,7 +209,7 @@
     window.toggleZone = function(zoneKey, newStatus) {
       const user = formatName(nameInput.value, true);
       if (!user) {
-        alert("Vennligst skriv inn fornavnet ditt først!");
+        alert("Vennligst oppgi fornavnet ditt først!");
         nameInput.focus();
         return;
       }
