@@ -61,6 +61,8 @@
     .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     button { padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 700; transition: transform 0.1s, background-color 0.2s; }
     button:active { transform: scale(0.97); }
+    button.btn-current { cursor: default; }
+    button.btn-current:active { transform: none; }
     .btn-on { background: #16a34a; color: white; }
     .btn-off { background: #dc2626; color: white; }
     .btn-inactive { background: #94a3b8; color: #f8fafc; }
@@ -227,6 +229,8 @@
       zone3: { name: "Nederst", status: "OFF", updatedBy: "System", time: "" }
     };
 
+    let currentZonesData = { ...defaultZones };
+
     function formatDateTime() {
       const now = new Date();
       const datePart = now.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' });
@@ -288,6 +292,11 @@
     });
 
     window.toggleZone = function(zoneKey, newStatus) {
+      const currentStatus = (currentZonesData[zoneKey] || defaultZones[zoneKey]).status;
+      if (currentStatus === newStatus) {
+        return;
+      }
+
       const user = formatName(nameInput.value, true);
       if (!user) {
         alert("Vennligst oppgi fornavnet ditt først!");
@@ -311,6 +320,7 @@
 
     onValue(zonesRef, (snapshot) => {
       const data = snapshot.val() || defaultZones;
+      currentZonesData = data;
       const container = document.getElementById('zonesContainer');
       container.innerHTML = '<h2>Varmekabler tilfartsvei</h2>';
       Object.keys(defaultZones).forEach((key) => {
@@ -327,8 +337,8 @@
               ${elapsedHtml}
             </div>
             <div class="btn-group">
-              <button class="btn-on ${!isOn ? 'btn-inactive' : ''}" onclick="toggleZone('${key}', 'ON')">PÅ</button>
-              <button class="btn-off ${isOn ? 'btn-inactive' : ''}" onclick="toggleZone('${key}', 'OFF')">AV</button>
+              <button class="btn-on ${isOn ? 'btn-current' : 'btn-inactive'}" onclick="toggleZone('${key}', 'ON')">PÅ</button>
+              <button class="btn-off ${!isOn ? 'btn-current' : 'btn-inactive'}" onclick="toggleZone('${key}', 'OFF')">AV</button>
             </div>
           </div>`;
       });
