@@ -159,13 +159,33 @@
 
     const deviceId = getOrCreateDeviceId();
 
+    function detectDeviceInfo() {
+      const ua = navigator.userAgent || "";
+      let os = "Ukjent";
+      if (/iPhone/i.test(ua)) os = "iPhone";
+      else if (/iPad/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) os = "iPad";
+      else if (/Android/i.test(ua)) os = "Android";
+      else if (/Windows/i.test(ua)) os = "Windows";
+      else if (/Macintosh|Mac OS X/i.test(ua)) os = "Mac";
+      else if (/Linux/i.test(ua)) os = "Linux";
+
+      let browser = "Nettleser";
+      if (/Edg\//i.test(ua)) browser = "Edge";
+      else if (/CriOS|Chrome/i.test(ua) && !/Edg/i.test(ua)) browser = "Chrome";
+      else if (/FxiOS|Firefox/i.test(ua)) browser = "Firefox";
+      else if (/Safari/i.test(ua) && !/Chrome|CriOS|Edg/i.test(ua)) browser = "Safari";
+
+      return { os, browser };
+    }
+
     function getDeviceMetadata() {
       let timezone = "Ukjent";
       try {
         timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Ukjent";
       } catch (e) {}
       const language = navigator.language || "Ukjent";
-      return { deviceId, timezone, language };
+      const { os, browser } = detectDeviceInfo();
+      return { deviceId, os, browser, timezone, language };
     }
 
     function updatePinStatus(isFromStorage = false) {
@@ -340,6 +360,8 @@
         time: timestamp,
         updatedAt: nowMs,
         deviceId: meta.deviceId,
+        os: meta.os,
+        browser: meta.browser,
         timezone: meta.timezone,
         language: meta.language
       };
