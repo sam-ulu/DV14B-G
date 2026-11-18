@@ -271,7 +271,7 @@
     onValue(historyRef, (snapshot) => {
       const logContainer = document.getElementById('activityLog');
       if (!snapshot.exists()) {
-        logContainer.innerHTML = '<li class="log-item">Ingen endringer registrert ennå (tomt svar fra Firebase).</li>';
+        logContainer.innerHTML = '<li class="log-item">Ingen endringer registrert ennå (tomt svar fra db).</li>';
         return;
       }
       const entries = [];
