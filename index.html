@@ -244,9 +244,9 @@
       }
     });
     const defaultZones = {
-      zone1: { name: "Øverst", status: "OFF", updatedBy: "System", time: "" },
-      zone2: { name: "Midt", status: "OFF", updatedBy: "System", time: "" },
-      zone3: { name: "Nederst", status: "OFF", updatedBy: "System", time: "" }
+      zone1: { zonename: "Øverst", status: "OFF", user: "System", time: "" },
+      zone2: { zonename: "Midt", status: "OFF", user: "System", time: "" },
+      zone3: { zonename: "Nederst", status: "OFF", user: "System", time: "" }
     };
 
     let currentZonesData = { ...defaultZones };
@@ -330,21 +330,11 @@
       localStorage.setItem('zoneBoardUserName', user);
       const nowMs = Date.now();
       const timestamp = formatDateTime();
-      const zoneName = defaultZones[zoneKey].name;
+      const zoneName = defaultZones[zoneKey].zonename;
       const meta = getDeviceMetadata();
 
-      set(ref(db, 'zones/' + zoneKey), {
-        name: zoneName,
-        status: newStatus,
-        updatedBy: user,
-        time: timestamp,
-        updatedAt: nowMs,
-        deviceId: meta.deviceId,
-        timezone: meta.timezone,
-        language: meta.language
-      });
-      push(ref(db, 'history'), {
-        zone: zoneName,
+      const payload = {
+        zonename: zoneName,
         status: newStatus,
         user: user,
         time: timestamp,
@@ -352,7 +342,10 @@
         deviceId: meta.deviceId,
         timezone: meta.timezone,
         language: meta.language
-      });
+      };
+
+      set(ref(db, 'zones/' + zoneKey), payload);
+      push(ref(db, 'history'), payload);
     };
 
     onValue(zonesRef, (snapshot) => {
@@ -370,7 +363,7 @@
         container.innerHTML += `
           <div class="zone">
             <div class="zone-header">
-              <span class="zone-title">${defaultZones[key].name}</span>
+              <span class="zone-title">${defaultZones[key].zonename}</span>
               ${elapsedHtml}
             </div>
             <div class="btn-group">
@@ -397,7 +390,7 @@
       entries.reverse();
       logContainer.innerHTML = entries.map(item => {
         const isOn = item.status === "ON";
-        const zoneText = String(item.zone || 'Sone');
+        const zoneText = String(item.zonename || item.zone || 'Sone');
         const userText = String(item.user || 'Ukjent');
         const timeText = String(item.time || '');
         return `
@@ -417,4 +410,3 @@
   </script>
 </body>
 </html>
-
