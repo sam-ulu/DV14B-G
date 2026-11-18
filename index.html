@@ -231,12 +231,12 @@
     window.toggleZone = function(zoneKey, newStatus) {
       const user = formatName(nameInput.value, true);
       if (!user) {
-        alert("Vennligst oppgi fornavnet ditt først!");
+        alert("Bla nederst på siden og oppgi fornavnet ditt først!");
         nameInput.focus();
         return;
       }
       if (pinInput.value !== accessPin) {
-        alert("Vennligst skriv inn riktig PIN først!");
+        alert("Bla nederst på siden og oppgi riktig PIN først!");
         pinInput.focus();
         return;
       }
