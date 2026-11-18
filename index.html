@@ -48,8 +48,16 @@
     .error-note { font-size: 13px; color: #dc2626; margin-top: 8px; font-weight: 400; }
     .zone { border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-bottom: 12px; background: #f8fafc; }
     .zone:last-child { margin-bottom: 0; }
-    .zone-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .zone-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: baseline; 
+      width: calc(50% - 5px); 
+      margin-bottom: 6px; 
+      gap: 8px; 
+    }
     .zone-title { font-size: 18px; font-weight: 700; }
+    .zone-elapsed { font-size: 13px; font-weight: 600; color: #16a34a; white-space: nowrap; }
     .meta { font-size: 13px; color: #475569; margin-bottom: 12px; }
     .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     button { padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 700; transition: transform 0.1s, background-color 0.2s; }
@@ -228,25 +236,79 @@
       return `${datePart} kl. ${timePart}`;
     }
 
+    function parseLegacyTime(timeStr) {
+      if (!timeStr) return null;
+      const match = timeStr.match(/(\d+)\.\s*([a-zæøå]+)\.?\s*kl\.\s*(\d{2}):(\d{2})/i);
+      if (!match) return null;
+      const months = {
+        jan: 0, feb: 1, mar: 2, apr: 3, mai: 4, jun: 5,
+        jul: 6, aug: 7, sep: 8, okt: 9, nov: 10, des: 11
+      };
+      const monthKey = match.toLowerCase().slice(0, 3);
+      if (months[monthKey] === undefined) return null;
+      const now = new Date();
+      let candidate = new Date(
+        now.getFullYear(),
+        months[monthKey],
+        parseInt(match, 10),
+        parseInt(match, 10),
+        parseInt(match, 10)
+      );
+      if (candidate.getTime() > now.getTime() + 86400000) {
+        candidate.setFullYear(now.getFullYear() - 1);
+      }
+      return candidate.getTime();
+    }
+
+    function formatElapsed(timestampMs) {
+      if (!timestampMs) return "";
+      const diffMs = Math.max(0, Date.now() - timestampMs);
+      const totalMins = Math.floor(diffMs / 60000);
+      if (totalMins < 60) return `${totalMins} min`;
+      const hours = Math.floor(totalMins / 60);
+      const mins = totalMins % 60;
+      if (hours < 24) {
+        return mins > 0 ? `${hours} t ${mins} min` : `${hours} t`;
+      }
+      const days = Math.floor(hours / 24);
+      const remHours = hours % 24;
+      return remHours > 0 ? `${days} d ${remHours} t` : `${days} d`;
+    }
+
+    function refreshElapsedTimers() {
+      document.querySelectorAll('.zone-elapsed[data-ts]').forEach((el) => {
+        const ts = Number(el.dataset.ts);
+        if (ts) {
+          el.textContent = formatElapsed(ts);
+        }
+      });
+    }
+
+    setInterval(refreshElapsedTimers, 60000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) refreshElapsedTimers();
+    });
+
     window.toggleZone = function(zoneKey, newStatus) {
       const user = formatName(nameInput.value, true);
       if (!user) {
-        alert("Bla nederst på siden og oppgi fornavnet ditt først!");
+        alert("Vennligst oppgi fornavnet ditt først!");
         nameInput.focus();
         return;
       }
       if (pinInput.value !== accessPin) {
-        alert("Bla nederst på siden og oppgi riktig PIN først!");
+        alert("Vennligst skriv inn riktig PIN først!");
         pinInput.focus();
         return;
       }
       nameInput.value = user;
       localStorage.setItem('zoneBoardUserName', user);
+      const nowMs = Date.now();
       const timestamp = formatDateTime();
       const zoneName = defaultZones[zoneKey].name;
 
-      set(ref(db, 'zones/' + zoneKey), { name: zoneName, status: newStatus, updatedBy: user, time: timestamp });
-      push(ref(db, 'history'), { zone: zoneName, status: newStatus, user: user, time: timestamp });
+      set(ref(db, 'zones/' + zoneKey), { name: zoneName, status: newStatus, updatedBy: user, time: timestamp, updatedAt: nowMs });
+      push(ref(db, 'history'), { zone: zoneName, status: newStatus, user: user, time: timestamp, updatedAt: nowMs });
     };
 
     onValue(zonesRef, (snapshot) => {
@@ -256,9 +318,16 @@
       Object.keys(defaultZones).forEach((key) => {
         const z = data[key] || defaultZones[key];
         const isOn = z.status === "ON";
+        const ts = isOn ? (z.updatedAt || parseLegacyTime(z.time) || "") : "";
+        const elapsedHtml = (isOn && ts)
+          ? `<span class="zone-elapsed" data-ts="${ts}">${formatElapsed(ts)}</span>`
+          : '';
         container.innerHTML += `
           <div class="zone">
-            <div class="zone-header"><span class="zone-title">${defaultZones[key].name}</span></div>
+            <div class="zone-header">
+              <span class="zone-title">${defaultZones[key].name}</span>
+              ${elapsedHtml}
+            </div>
             <div class="meta">Sist endret av <strong>${z.updatedBy}</strong> ${z.time ? '(' + z.time + ')' : ''}</div>
             <div class="btn-group">
               <button class="btn-on ${!isOn ? 'btn-inactive' : ''}" onclick="toggleZone('${key}', 'ON')">PÅ</button>
