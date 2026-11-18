@@ -88,14 +88,8 @@
       flex-shrink: 0;
       margin-right: 4px;
     }
-    .log-user {
-      color: #1e293b;
-      font-weight: 600;
-    }
-    .log-time { 
-      color: #64748b; 
-      font-size: 12px; 
-    }
+    .log-user { color: #1e293b; font-weight: 600; }
+    .log-time { color: #64748b; font-size: 12px; }
   </style>
 </head>
 <body>
@@ -137,6 +131,7 @@
       measurementId: "G-5JV19DK8WT"
     };
     // TIL HIT
+
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const zonesRef = ref(db, 'zones');
@@ -146,6 +141,32 @@
     const pinInput = document.getElementById('pinInput');
     const pinNote = document.getElementById('pinNote');
     const accessPin = "0776";
+
+    function getOrCreateDeviceId() {
+      let id = localStorage.getItem('zoneBoardDeviceId');
+      if (!id || id.length !== 13 || id.indexOf(',') !== -1) {
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+          id = window.crypto.randomUUID().slice(0, 13);
+        } else {
+          const part1 = Math.random().toString(16).slice(2, 10);
+          const part2 = Math.random().toString(16).slice(2, 6);
+          id = part1 + '-' + part2;
+        }
+        localStorage.setItem('zoneBoardDeviceId', id);
+      }
+      return id;
+    }
+
+    const deviceId = getOrCreateDeviceId();
+
+    function getDeviceMetadata() {
+      let timezone = "Ukjent";
+      try {
+        timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Ukjent";
+      } catch (e) {}
+      const language = navigator.language || "Ukjent";
+      return { deviceId, timezone, language };
+    }
 
     function updatePinStatus(isFromStorage = false) {
       const currentPin = pinInput.value;
@@ -222,7 +243,6 @@
         savedNote.textContent = "";
       }
     });
-
     const defaultZones = {
       zone1: { name: "Øverst", status: "OFF", updatedBy: "System", time: "" },
       zone2: { name: "Midt", status: "OFF", updatedBy: "System", time: "" },
@@ -246,15 +266,17 @@
         jan: 0, feb: 1, mar: 2, apr: 3, mai: 4, jun: 5,
         jul: 6, aug: 7, sep: 8, okt: 9, nov: 10, des: 11
       };
-      const monthKey = match.toLowerCase().slice(0, 3);
+      const monthPart = match.at(2);
+      if (!monthPart) return null;
+      const monthKey = monthPart.toLowerCase().slice(0, 3);
       if (months[monthKey] === undefined) return null;
       const now = new Date();
       let candidate = new Date(
         now.getFullYear(),
         months[monthKey],
-        parseInt(match, 10),
-        parseInt(match, 10),
-        parseInt(match, 10)
+        parseInt(match.at(1), 10),
+        parseInt(match.at(3), 10),
+        parseInt(match.at(4), 10)
       );
       if (candidate.getTime() > now.getTime() + 86400000) {
         candidate.setFullYear(now.getFullYear() - 1);
@@ -280,9 +302,7 @@
     function refreshElapsedTimers() {
       document.querySelectorAll('.zone-elapsed[data-ts]').forEach((el) => {
         const ts = Number(el.dataset.ts);
-        if (ts) {
-          el.textContent = formatElapsed(ts);
-        }
+        if (ts) el.textContent = formatElapsed(ts);
       });
     }
 
@@ -293,9 +313,7 @@
 
     window.toggleZone = function(zoneKey, newStatus) {
       const currentStatus = (currentZonesData[zoneKey] || defaultZones[zoneKey]).status;
-      if (currentStatus === newStatus) {
-        return;
-      }
+      if (currentStatus === newStatus) return;
 
       const user = formatName(nameInput.value, true);
       if (!user) {
@@ -313,9 +331,28 @@
       const nowMs = Date.now();
       const timestamp = formatDateTime();
       const zoneName = defaultZones[zoneKey].name;
+      const meta = getDeviceMetadata();
 
-      set(ref(db, 'zones/' + zoneKey), { name: zoneName, status: newStatus, updatedBy: user, time: timestamp, updatedAt: nowMs });
-      push(ref(db, 'history'), { zone: zoneName, status: newStatus, user: user, time: timestamp, updatedAt: nowMs });
+      set(ref(db, 'zones/' + zoneKey), {
+        name: zoneName,
+        status: newStatus,
+        updatedBy: user,
+        time: timestamp,
+        updatedAt: nowMs,
+        deviceId: meta.deviceId,
+        timezone: meta.timezone,
+        language: meta.language
+      });
+      push(ref(db, 'history'), {
+        zone: zoneName,
+        status: newStatus,
+        user: user,
+        time: timestamp,
+        updatedAt: nowMs,
+        deviceId: meta.deviceId,
+        timezone: meta.timezone,
+        language: meta.language
+      });
     };
 
     onValue(zonesRef, (snapshot) => {
@@ -352,17 +389,23 @@
       }
       const entries = [];
       snapshot.forEach((child) => {
-        entries.push(child.val());
+        const val = child.val();
+        if (val && typeof val === 'object') {
+          entries.push(val);
+        }
       });
       entries.reverse();
       logContainer.innerHTML = entries.map(item => {
         const isOn = item.status === "ON";
+        const zoneText = String(item.zone || 'Sone');
+        const userText = String(item.user || 'Ukjent');
+        const timeText = String(item.time || '');
         return `
           <li class="log-item">
-            <span class="${isOn ? 'text-on' : 'text-off'}">${item.zone || 'Sone'}</span>
+            <span class="${isOn ? 'text-on' : 'text-off'}">${zoneText}</span>
             <span class="log-right">
-              <span class="log-user">${item.user || 'Ukjent'}</span>
-              <span class="log-time">${item.time || ''}</span>
+              <span class="log-user">${userText}</span>
+              <span class="log-time">${timeText}</span>
             </span>
           </li>`;
       }).join('');
@@ -370,7 +413,7 @@
       const logContainer = document.getElementById('activityLog');
       logContainer.innerHTML = `<li class="log-item" style="color: #dc2626; font-weight: bold;">Firebase-feil: ${error.message}</li>`;
     });
-  </script>
 
+  </script>
 </body>
 </html>
