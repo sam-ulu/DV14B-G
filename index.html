@@ -53,12 +53,11 @@
       justify-content: space-between; 
       align-items: baseline; 
       width: calc(50% - 5px); 
-      margin-bottom: 6px; 
+      margin-bottom: 10px; 
       gap: 8px; 
     }
     .zone-title { font-size: 18px; font-weight: 700; }
     .zone-elapsed { font-size: 13px; font-weight: 600; color: #16a34a; white-space: nowrap; }
-    .meta { font-size: 13px; color: #475569; margin-bottom: 12px; }
     .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     button { padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 700; transition: transform 0.1s, background-color 0.2s; }
     button:active { transform: scale(0.97); }
@@ -136,7 +135,6 @@
       measurementId: "G-5JV19DK8WT"
     };
     // TIL HIT
-
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const zonesRef = ref(db, 'zones');
@@ -328,7 +326,6 @@
               <span class="zone-title">${defaultZones[key].name}</span>
               ${elapsedHtml}
             </div>
-            <div class="meta">Sist endret av <strong>${z.updatedBy}</strong> ${z.time ? '(' + z.time + ')' : ''}</div>
             <div class="btn-group">
               <button class="btn-on ${!isOn ? 'btn-inactive' : ''}" onclick="toggleZone('${key}', 'ON')">PÅ</button>
               <button class="btn-off ${isOn ? 'btn-inactive' : ''}" onclick="toggleZone('${key}', 'OFF')">AV</button>
