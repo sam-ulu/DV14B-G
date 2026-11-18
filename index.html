@@ -317,12 +317,12 @@
 
       const user = formatName(nameInput.value, true);
       if (!user) {
-        alert("Bla ned, fornavn kreves for å endre!");
+        alert("Bla ned, oppgi fornavn for å endre!\n\nHuskes deretter.");
         nameInput.focus();
         return;
       }
       if (pinInput.value !== accessPin) {
-        alert("Bla ned, riktig PIN kreves for å endre!");
+        alert("Bla ned, oppgi riktig PIN for å endre!\n\nHuskes deretter.");
         pinInput.focus();
         return;
       }
