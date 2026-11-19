@@ -29,7 +29,6 @@
       gap: 12px;
       margin-bottom: 16px;
     }
-    .bottom-grid .card { margin-bottom: 0; min-width: 0; }
     .card { 
       background: #ffffff; 
       padding: 18px; 
@@ -42,7 +41,8 @@
     input[type="text"], input[type="password"] { 
       width: 100%; 
       padding: 14px; 
-      font-size: 16px; 
+      font-size: 16px;
+      background: #ffffff; 
       border: 2px solid #cbd5e1; 
       border-radius: 10px; 
       outline: none;
@@ -54,7 +54,6 @@
     input:focus { border-color: #64748b; }
     .saved-note { font-size: 13px; color: #15803d; margin-top: 8px; font-weight: 400; }
     .error-note { font-size: 13px; color: #dc2626; margin-top: 8px; font-weight: 400; }
-    //.zone { border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-bottom: 12px; background: #f8fafc; }
     .zone { border: 1px solid #cbd5e1; border-radius: 12px; padding: 14px; margin-bottom: 12px; background: #f1f5f9; }
     .zone:last-child { margin-bottom: 0; }
     .zone-header { 
@@ -65,7 +64,7 @@
       margin-bottom: 10px; 
       gap: 8px; 
     }
-    .zone-title { font-size: 18px; font-weight: 700; }
+    .zone-title { font-size: 15px; font-weight: 700; color: #1e293b; }
     .zone-elapsed { font-size: 13px; font-weight: 600; color: #16a34a; white-space: nowrap; }
     .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     button { padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 700; transition: transform 0.1s, background-color 0.2s; }
@@ -92,7 +91,7 @@
     .log-right {
       display: flex;
       align-items: baseline;
-      gap: 32px;
+      gap: 16px;
       white-space: nowrap;
       flex-shrink: 0;
       margin-right: 4px;
@@ -139,10 +138,10 @@
       background: #f1f5f9;
       border: 1px solid #cbd5e1;
       border-radius: 12px;
-      padding: 12px;
+      padding: 14px;
     }
     .inner-box h3 {
-      margin: 0 0 8px 0;
+      margin: 0 0 10px 0;
       font-size: 15px;
       color: #1e293b;
     }
@@ -161,7 +160,7 @@
     </ul>
   </div>
 
-  <details class="card">
+<details class="card" id="settingsBox">
     <summary><span>Innstillinger</span></summary>
     <div class="info-text">
       
@@ -194,7 +193,7 @@
 
   <script type="module">
 
-    // NEDENFOR ER DET GJERNE LITT SOM MÅ ENDRES ETTER HJELP FRA AI
+    /* NEDENFOR ER DET GJERNE LITT SOM MÅ ENDRES ETTER HJELP FRA AI */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getDatabase, ref, set, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
     const firebaseConfig = {
@@ -207,7 +206,7 @@
       appId: "1:820368557888:web:5a28d46ebc7950f6151ca5",
       measurementId: "G-5JV19DK8WT"
     };
-    // TIL HIT
+    /* TIL HIT */
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
@@ -415,11 +414,13 @@
       const user = formatName(nameInput.value, true);
       if (!user) {
         alert("Bla ned, oppgi fornavn for å endre!\n\nHuskes deretter.");
+	document.getElementById('settingsBox').open = true;
         nameInput.focus();
         return;
       }
       if (pinInput.value !== accessPin) {
         alert("Bla ned, oppgi riktig PIN for å endre!\n\nHuskes deretter.");
+	document.getElementById('settingsBox').open = true;
         pinInput.focus();
         return;
       }
