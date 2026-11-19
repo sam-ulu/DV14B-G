@@ -99,6 +99,42 @@
     }
     .log-user { color: #1e293b; font-weight: 600; }
     .log-time { color: #64748b; font-size: 12px; }
+
+
+    details.card summary {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+    details.card summary::-webkit-details-marker,
+    details.card summary::marker {
+      display: none;
+      content: "";
+    }
+    details.card summary::after {
+      content: "▼";
+      font-size: 13px;
+      color: #64748b;
+      transition: transform 0.2s ease;
+    }
+    details.card[open] summary::after {
+      transform: rotate(180deg);
+    }
+    details.card .info-text {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #334155;
+    }
+
   </style>
 </head>
 <body>
@@ -124,6 +160,14 @@
       <div class="saved-note" id="pinNote"></div>
     </div>
   </div>
+
+  <details class="card">
+    <summary>Hvorfor registrere</summary>
+    <div class="info-text">
+      Her skriver du forklaringsteksten din om hvorfor man skal registrere når varmekablene slås av og på.
+    </div>
+  </details>
+
   <script type="module">
 
     // NEDENFOR ER DET GJERNE LITT SOM MÅ ENDRES ETTER HJELP FRA AI
