@@ -48,8 +48,8 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    #userName { font-weight: 700; color: #2563eb; }
-    #pinInput { font-weight: 400; color: #2563eb; }
+    #userName { font-weight: 700; color: #0369a1; }
+    #pinInput { font-weight: 400; color: #0369a1; }
     input::placeholder { color: #94a3b8; font-weight: 400; }
     input:focus { border-color: #64748b; }
     .saved-note { font-size: 13px; color: #15803d; margin-top: 8px; font-weight: 400; }
@@ -133,7 +133,16 @@
       line-height: 1.5;
       color: #334155;
     }
-
+    details.card .info-text ul {
+      margin: 0 0 14px 0;
+      padding-left: 20px;
+    }
+    details.card .info-text li {
+      margin-bottom: 6px;
+    }
+    details.card .info-text li:last-child {
+      margin-bottom: 0;
+    }
     .inner-box {
       background: #f1f5f9;
       border: 1px solid #cbd5e1;
@@ -163,13 +172,18 @@
 <details class="card" id="settingsBox">
     <summary><span>Innstillinger</span></summary>
     <div class="info-text">
-      
-      <!-- TEKST FØR FELTENE -->
+      <p style="margin-top: 0; margin-bottom: 14px;"><strong>Formål med siden</strong></p>
+      <ul>
+        <li>Gi naboene samme info du selv besitter. Nemlig faktisk status etter at du har slått en sone på eller av.</li>
+        <li>Unngå at soner står på unødvendig lenge. Noen ganger ser man behovet på vei ut. Andre ganger glemmer man seg. Da vil naboer raskere kunne fange det opp og slå av igjen.</li>
+        <li>Slippe turen til bryterpanelet kun for å sjekke status.</li>
+        <li>Tar man likevel turen og finner avvik, påser man naturligvis at denne siden samsvarer med faktisk status, slik at info igjen blir til nytte for alle.</li>
+      </ul>
+
       <p style="margin-top: 0; margin-bottom: 14px;">
-        Her skriver du eksempeltekst som vises <strong>før</strong> feltene for fornavn og PIN.
+        Faktiske endringer i selve bryterpanelet (eller retting av avvik) <strong>skal</strong> altså registreres over og krever at fornavn og PIN oppgis;
       </p>
 
-      <!-- FORNAVN OG PIN SIDE OM SIDE -->
       <div class="bottom-grid" style="margin-bottom: 14px;">
         <div class="inner-box">
           <h3>Fornavn</h3>
@@ -183,9 +197,8 @@
         </div>
       </div>
 
-      <!-- TEKST ETTER FELTENE -->
       <p style="margin-top: 0; margin-bottom: 0;">
-        Her skriver du eksempeltekst som vises <strong>under</strong> feltene.
+         Feltene kan senere endres, men det som sist er oppgitt vil huskes i nettleseren.
       </p>
 
     </div>
