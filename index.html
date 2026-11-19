@@ -426,13 +426,13 @@
 
       const user = formatName(nameInput.value, true);
       if (!user) {
-        alert("Bla ned, oppgi fornavn for å endre!\n\nHuskes deretter.");
+        alert("Bla ned, åpne innstillinger, oppgi fornavn for å registrere endring!\n\nHuskes deretter.");
 	document.getElementById('settingsBox').open = true;
         nameInput.focus();
         return;
       }
       if (pinInput.value !== accessPin) {
-        alert("Bla ned, oppgi riktig PIN for å endre!\n\nHuskes deretter.");
+        alert("Bla ned, åpne innstillinger, oppgi PIN for å registrere endring!\n\nHuskes deretter.");
 	document.getElementById('settingsBox').open = true;
         pinInput.focus();
         return;
