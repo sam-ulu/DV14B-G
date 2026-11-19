@@ -135,6 +135,18 @@
       color: #334155;
     }
 
+    .inner-box {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .inner-box h3 {
+      margin: 0 0 8px 0;
+      font-size: 15px;
+      color: #1e293b;
+    }
+
   </style>
 </head>
 <body>
@@ -148,23 +160,35 @@
       <li class="log-item">Ingen endringer registrert ennå.</li>
     </ul>
   </div>
-  <div class="bottom-grid">
-    <div class="card">
-      <h2>Fornavn</h2>
-      <input type="text" id="userName" maxlength="15" autocomplete="name" placeholder="...">
-      <div class="saved-note" id="savedNote"></div>
-    </div>
-    <div class="card">
-      <h2>PIN</h2>
-      <input type="password" id="pinInput" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="...">
-      <div class="saved-note" id="pinNote"></div>
-    </div>
-  </div>
 
   <details class="card">
-    <summary>Hvorfor registrere</summary>
+    <summary><span>Innstillinger</span></summary>
     <div class="info-text">
-      Her skriver du forklaringsteksten din om hvorfor man skal registrere når varmekablene slås av og på.
+      
+      <!-- TEKST FØR FELTENE -->
+      <p style="margin-top: 0; margin-bottom: 14px;">
+        Her skriver du eksempeltekst som vises <strong>før</strong> feltene for fornavn og PIN.
+      </p>
+
+      <!-- FORNAVN OG PIN SIDE OM SIDE -->
+      <div class="bottom-grid" style="margin-bottom: 14px;">
+        <div class="inner-box">
+          <h3>Fornavn</h3>
+          <input type="text" id="userName" maxlength="15" autocomplete="name" placeholder="...">
+          <div class="saved-note" id="savedNote"></div>
+        </div>
+        <div class="inner-box">
+          <h3>PIN</h3>
+          <input type="password" id="pinInput" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="...">
+          <div class="saved-note" id="pinNote"></div>
+        </div>
+      </div>
+
+      <!-- TEKST ETTER FELTENE -->
+      <p style="margin-top: 0; margin-bottom: 0;">
+        Her skriver du eksempeltekst som vises <strong>under</strong> feltene.
+      </p>
+
     </div>
   </details>
 
