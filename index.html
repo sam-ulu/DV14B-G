@@ -48,6 +48,17 @@
       outline: none;
       transition: border-color 0.2s;
     }
+    .zone-footer {
+      margin: 14px 0 0 0;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #334155;
+    }
+    .zone-footer a {
+      color: #64748b;
+      text-decoration: underline;
+      cursor: pointer;
+    }
     #userName { font-weight: 700; color: #0369a1; }
     #pinInput { font-weight: 400; color: #0369a1; }
     input::placeholder { color: #94a3b8; font-weight: 400; }
@@ -170,7 +181,7 @@
   </div>
 
 <details class="card" id="settingsBox">
-    <summary><span>Innstillinger</span></summary>
+    <summary><span>Formål og innstillinger</span></summary>
     <div class="info-text">
       <p style="margin-top: 0; margin-bottom: 14px;"><strong>Formål med siden</strong></p>
       <ul>
@@ -420,19 +431,26 @@
       if (!document.hidden) refreshElapsedTimers();
     });
 
+    window.openSettings = function(e) {
+      e.preventDefault();
+      const settingsBox = document.getElementById('settingsBox');
+      settingsBox.open = true;
+      settingsBox.scrollIntoView({ behavior: 'smooth' });
+    };
+
     window.toggleZone = function(zoneKey, newStatus) {
       const currentStatus = (currentZonesData[zoneKey] || defaultZones[zoneKey]).status;
       if (currentStatus === newStatus) return;
 
       const user = formatName(nameInput.value, true);
       if (!user) {
-        alert("Bla ned, åpne innstillinger, oppgi fornavn for å registrere endring!\n\nHuskes deretter.");
+        alert("Bla ned, åpne formål og innstillinger, oppgi fornavn for å registrere endring!\n\nHuskes deretter.");
 	document.getElementById('settingsBox').open = true;
         nameInput.focus();
         return;
       }
       if (pinInput.value !== accessPin) {
-        alert("Bla ned, åpne innstillinger, oppgi PIN for å registrere endring!\n\nHuskes deretter.");
+        alert("Bla ned, åpne formål og innstillinger, oppgi PIN for å registrere endring!\n\nHuskes deretter.");
 	document.getElementById('settingsBox').open = true;
         pinInput.focus();
         return;
@@ -485,6 +503,7 @@
             </div>
           </div>`;
       });
+      container.innerHTML += '<p class="zone-footer"><a href="#settingsBox" onclick="openSettings(event)">Se formål og innstillinger for rutine</a>.</p>';
     });
 
     onValue(historyRef, (snapshot) => {
