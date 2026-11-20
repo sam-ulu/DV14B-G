@@ -509,7 +509,7 @@
     onValue(historyRef, (snapshot) => {
       const logContainer = document.getElementById('activityLog');
       if (!snapshot.exists()) {
-        logContainer.innerHTML = '<li class="log-item">Ingen endringer registrert ennå (tomt svar fra db).</li>';
+        logContainer.innerHTML = '<li class="log-item">Ingen endringer registrert ennå.</li>';
         return;
       }
       const entries = [];
