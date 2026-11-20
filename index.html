@@ -48,6 +48,11 @@
       outline: none;
       transition: border-color 0.2s;
     }
+    .loading-text {
+      margin: 0;
+      font-size: 14px;
+      color: #64748b;
+    }
     .zone-footer {
       margin: 14px 0 0 0;
       font-size: 12px;
@@ -171,16 +176,16 @@
 <body>
   <div class="card" id="zonesContainer">
     <h2>Varmekabler tilfartsvei</h2>
-    <p>Laster inn soner...</p>
+    <p class="loading-text">Laster inn soner...</p>
   </div>
   <div class="card">
     <h2>Siste endringer</h2>
     <ul class="log-list" id="activityLog">
-      <li class="log-item">Laster inn historikk...</li>
+      <li class="loading-text">Laster inn historikk...</li>
     </ul>
   </div>
 
-<details class="card" id="settingsBox">
+  <details class="card" id="settingsBox">
     <summary><span>Formål og innstillinger</span></summary>
     <div class="info-text">
       <p style="margin-top: 0; margin-bottom: 14px;"><strong>Formål med siden</strong></p>
