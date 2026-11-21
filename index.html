@@ -99,9 +99,6 @@
       flex-direction: column;
       overflow: hidden;
     }
-    body:has(#settingsBox[open]) .log-card {
-      flex: 0 1 auto;
-    }
     .log-list { 
       list-style: none; 
       padding: 0; 
@@ -110,8 +107,8 @@
       min-height: 0;
       overflow-y: auto; 
     }
-    body:has(#settingsBox[open]) .log-list {
-      max-height: 112px;
+    body:has(#settingsBox[open]) .log-card {
+      max-height: 184px;
     }
     .log-item { 
       padding: 4px 0; 
