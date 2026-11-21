@@ -20,11 +20,15 @@
       margin: 0 auto; 
       padding: 16px; 
       background-color: #cbd5e1;
+      height: 100dvh;
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
       gap: 16px;
       color: #0f172a; 
+    }
+    body:has(#settingsBox[open]) {
+      height: auto;
     }
     .bottom-grid {
       display: grid;
@@ -90,17 +94,21 @@
     .btn-inactive { background: #94a3b8; color: #f8fafc; }
     .log-card {
       flex: 1;
-      min-height: 120px;
+      min-height: 110px;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
     .log-list { 
       list-style: none; 
       padding: 0; 
       margin: 0; 
       flex: 1;
-      max-height: 450px;
+      min-height: 0;
       overflow-y: auto; 
+    }
+    body:has(#settingsBox[open]) .log-list {
+      max-height: 220px;
     }
     .log-item { 
       padding: 12px 0; 
