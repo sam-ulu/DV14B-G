@@ -20,7 +20,11 @@
       margin: 0 auto; 
       padding: 16px; 
       background-color: #cbd5e1;
-      min-height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow: hidden;
       color: #0f172a; 
     }
     .bottom-grid {
@@ -35,7 +39,8 @@
       border-radius: 14px; 
       border: 1px solid #94a3b8;
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08); 
-      margin-bottom: 16px; 
+      margin-bottom: 0;
+      flex-shrink: 0;
     }
     h2 { margin: 0 0 12px 0; font-size: 18px; font-weight: 700; color: #1e293b; }
     input[type="text"], input[type="password"] { 
@@ -95,7 +100,20 @@
     .btn-on { background: #16a34a; color: white; }
     .btn-off { background: #dc2626; color: white; }
     .btn-inactive { background: #94a3b8; color: #f8fafc; }
-    .log-list { list-style: none; padding: 0; margin: 0; max-height: 520px; overflow-y: auto; }
+    .log-card {
+      flex: 1;
+      min-height: 58px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .log-list { 
+      list-style: none; 
+      padding: 0; 
+      margin: 0; 
+      flex: 1;
+      overflow-y: auto; 
+    }
     .log-item { 
       padding: 12px 0; 
       border-bottom: 1px solid #e2e8f0; 
@@ -176,10 +194,14 @@
       color: #1e293b;
     }
     #settingsBox {
-      scroll-margin-top: 16px;
-      scroll-margin-bottom: 16px;
+      flex-shrink: 1;
+      max-height: calc(100dvh - 32px);
+      display: flex;
+      flex-direction: column;
     }
-
+    #settingsBox[open] .info-text {
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -187,7 +209,7 @@
     <h2>Varmekabler tilfartsvei</h2>
     <p class="loading-text">Laster inn soner...</p>
   </div>
-  <div class="card">
+    <div class="card log-card">
     <h2>Siste endringer</h2>
     <ul class="log-list" id="activityLog">
       <li class="loading-text">Laster inn historikk...</li>
@@ -451,30 +473,8 @@
 
     window.openSettings = function(e) {
       e.preventDefault();
-      if (!settingsBox.open) {
-        settingsBox.open = true; // Utløser 'toggle'-hendelsen under (forceBottom = false)
-      } else {
-        scrollToSettings(false);
-      }
+      settingsBox.open = true;
     };
-
-    function scrollToSettings(forceBottom = false) {
-      const rect = settingsBox.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const fitsOnScreen = (rect.height + 32) <= viewportHeight;
-
-      settingsBox.scrollIntoView({
-        behavior: 'smooth',
-        block: (forceBottom || fitsOnScreen) ? 'end' : 'start'
-      });
-    }
-
-    settingsBox.addEventListener('toggle', () => {
-      if (settingsBox.open && !settingsBox.dataset.skipToggleScroll) {
-        scrollToSettings(false);
-      }
-      delete settingsBox.dataset.skipToggleScroll;
-    });
 
     window.toggleZone = function(zoneKey, newStatus) {
       const currentStatus = (currentZonesData[zoneKey] || defaultZones[zoneKey]).status;
@@ -492,14 +492,9 @@
           pinNote.className = "error-note";
           pinNote.textContent = "Oppgi";
         }
-        if (!settingsBox.open) {
-          settingsBox.dataset.skipToggleScroll = "true";
-          settingsBox.open = true;
-        }
-        scrollToSettings(true); // Tvinger bunnen (Fornavn og PIN) inn på skjermen
+        settingsBox.open = true;
         return;
       }
-
       nameInput.value = user;
       localStorage.setItem('zoneBoardUserName', user);
       const nowMs = Date.now();
