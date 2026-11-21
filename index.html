@@ -176,6 +176,7 @@
       color: #1e293b;
     }
     #settingsBox {
+      scroll-margin-top: 16px;
       scroll-margin-bottom: 16px;
     }
 
@@ -448,10 +449,38 @@
 
     window.openSettings = function(e) {
       e.preventDefault();
-      const settingsBox = document.getElementById('settingsBox');
-      settingsBox.open = true;
-      settingsBox.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      if (!settingsBox.open) {
+        settingsBox.open = true; // Utløser 'toggle'-hendelsen over (forceBottom = false)
+      } else {
+        scrollToSettings(false);
+      }
     };
+
+    const settingsBox = document.getElementById('settingsBox');
+
+    function scrollToSettings(forceBottom = false) {
+      const rect = settingsBox.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const fitsOnScreen = (rect.height + 32) <= viewportHeight;
+
+      settingsBox.scrollIntoView({
+        behavior: 'smooth',
+        block: (forceBottom || fitsOnScreen) ? 'end' : 'start'
+      });
+    }
+
+    settingsBox.addEventListener('toggle', () => {
+      if (settingsBox.open && !settingsBox.dataset.skipToggleScroll) {
+        scrollToSettings(false);
+      }
+      delete settingsBox.dataset.skipToggleScroll;
+    });
+
+    settingsBox.addEventListener('toggle', () => {
+      if (settingsBox.open) {
+        scrollToSettings();
+      }
+    });
 
     window.toggleZone = function(zoneKey, newStatus) {
       const currentStatus = (currentZonesData[zoneKey] || defaultZones[zoneKey]).status;
@@ -470,10 +499,14 @@
           pinNote.className = "error-note";
           pinNote.textContent = "Oppgi";
         }
-        settingsBox.open = true;
-        settingsBox.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        if (!settingsBox.open) {
+          settingsBox.dataset.skipToggleScroll = "true";
+          settingsBox.open = true;
+        }
+        scrollToSettings(true); // Tvinger bunnen (Fornavn og PIN) inn på skjermen
         return;
       }
+
       nameInput.value = user;
       localStorage.setItem('zoneBoardUserName', user);
       const nowMs = Date.now();
