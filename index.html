@@ -476,12 +476,6 @@
       delete settingsBox.dataset.skipToggleScroll;
     });
 
-    settingsBox.addEventListener('toggle', () => {
-      if (settingsBox.open) {
-        scrollToSettings();
-      }
-    });
-
     window.toggleZone = function(zoneKey, newStatus) {
       const currentStatus = (currentZonesData[zoneKey] || defaultZones[zoneKey]).status;
       if (currentStatus === newStatus) return;
