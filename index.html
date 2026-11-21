@@ -448,17 +448,20 @@
       const currentStatus = (currentZonesData[zoneKey] || defaultZones[zoneKey]).status;
       if (currentStatus === newStatus) return;
 
+      const settingsBox = document.getElementById('settingsBox');
       const user = formatName(nameInput.value, true);
       if (!user) {
-        alert("Bla ned, åpne formål og innstillinger, oppgi fornavn for å registrere endring!\n\nHuskes deretter.");
-	document.getElementById('settingsBox').open = true;
-        nameInput.focus();
+        alert("Oppgi fornavn under formål og innstillinger for å registrere endring!\n\nHuskes deretter.");
+        settingsBox.open = true;
+        settingsBox.scrollIntoView({ behavior: 'smooth' });
+        nameInput.focus({ preventScroll: true });
         return;
       }
       if (pinInput.value !== accessPin) {
-        alert("Bla ned, åpne formål og innstillinger, oppgi PIN for å registrere endring!\n\nHuskes deretter.");
-	document.getElementById('settingsBox').open = true;
-        pinInput.focus();
+        alert("Oppgi PIN under formål og innstillinger for å registrere endring!\n\nHuskes deretter.");
+        settingsBox.open = true;
+        settingsBox.scrollIntoView({ behavior: 'smooth' });
+        pinInput.focus({ preventScroll: true });
         return;
       }
       nameInput.value = user;
