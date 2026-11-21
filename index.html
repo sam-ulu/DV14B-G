@@ -356,6 +356,7 @@
       const cleanName = formatName(formattedValue, true);
       if (cleanName) {
         localStorage.setItem('zoneBoardUserName', cleanName);
+        savedNote.className = "saved-note";
         savedNote.textContent = "✓ Lagret";
       } else {
         localStorage.removeItem('zoneBoardUserName');
@@ -453,18 +454,24 @@
 
       const settingsBox = document.getElementById('settingsBox');
       const user = formatName(nameInput.value, true);
-      if (!user) {
-        alert("Oppgi fornavn under formål og innstillinger for å registrere endring!\n\nHuskes deretter.");
+      const isPinValid = pinInput.value === accessPin;
+
+      if (!user || !isPinValid) {
+        if (!user) {
+          savedNote.className = "error-note";
+          savedNote.textContent = "Oppgi";
+        }
+        if (!isPinValid && pinInput.value.length === 0) {
+          pinNote.className = "error-note";
+          pinNote.textContent = "Oppgi";
+        }
         settingsBox.open = true;
         settingsBox.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        nameInput.focus({ preventScroll: true });
-        return;
-      }
-      if (pinInput.value !== accessPin) {
-        alert("Oppgi PIN under formål og innstillinger for å registrere endring!\n\nHuskes deretter.");
-        settingsBox.open = true;
-        settingsBox.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        pinInput.focus({ preventScroll: true });
+        if (!user) {
+          nameInput.focus({ preventScroll: true });
+        } else {
+          pinInput.focus({ preventScroll: true });
+        }
         return;
       }
       nameInput.value = user;
