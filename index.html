@@ -20,11 +20,10 @@
       margin: 0 auto; 
       padding: 16px; 
       background-color: #cbd5e1;
-      height: 100dvh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      overflow: hidden;
       color: #0f172a; 
     }
     .bottom-grid {
@@ -57,17 +56,6 @@
       margin: 0;
       font-size: 12px;
       color: #64748b;
-    }
-    .zone-footer {
-      margin: 14px 0 0 0;
-      font-size: 12px;
-      line-height: 1.5;
-      color: #64748b;
-    }
-    .zone-footer a {
-      color: #64748b;
-      text-decoration: underline;
-      cursor: pointer;
     }
     #userName { font-weight: 700; color: #0369a1; }
     #pinInput { 
@@ -102,16 +90,16 @@
     .btn-inactive { background: #94a3b8; color: #f8fafc; }
     .log-card {
       flex: 1;
-      min-height: 58px;
+      min-height: 120px;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
     }
     .log-list { 
       list-style: none; 
       padding: 0; 
       margin: 0; 
       flex: 1;
+      max-height: 450px;
       overflow-y: auto; 
     }
     .log-item { 
@@ -194,10 +182,8 @@
       color: #1e293b;
     }
     #settingsBox {
-      flex-shrink: 1;
-      max-height: calc(100dvh - 32px);
-      display: flex;
-      flex-direction: column;
+      scroll-margin-top: 16px;
+      scroll-margin-bottom: 16px;
     }
     #settingsBox[open] .info-text {
       overflow-y: auto;
@@ -471,10 +457,23 @@
 
     const settingsBox = document.getElementById('settingsBox');
 
-    window.openSettings = function(e) {
-      e.preventDefault();
-      settingsBox.open = true;
-    };
+    function scrollToSettings(forceBottom = false) {
+      const rect = settingsBox.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const fitsOnScreen = (rect.height + 32) <= viewportHeight;
+
+      settingsBox.scrollIntoView({
+        behavior: 'smooth',
+        block: (forceBottom || fitsOnScreen) ? 'end' : 'start'
+      });
+    }
+
+    settingsBox.addEventListener('toggle', () => {
+      if (settingsBox.open && !settingsBox.dataset.skipToggleScroll) {
+        scrollToSettings(false);
+      }
+      delete settingsBox.dataset.skipToggleScroll;
+    });
 
     window.toggleZone = function(zoneKey, newStatus) {
       const currentStatus = (currentZonesData[zoneKey] || defaultZones[zoneKey]).status;
@@ -492,9 +491,14 @@
           pinNote.className = "error-note";
           pinNote.textContent = "Oppgi";
         }
-        settingsBox.open = true;
+        if (!settingsBox.open) {
+          settingsBox.dataset.skipToggleScroll = "true";
+          settingsBox.open = true;
+        }
+        scrollToSettings(true);
         return;
       }
+
       nameInput.value = user;
       localStorage.setItem('zoneBoardUserName', user);
       const nowMs = Date.now();
@@ -543,7 +547,6 @@
             </div>
           </div>`;
       });
-      container.innerHTML += '<p class="zone-footer"><a href="#settingsBox" onclick="openSettings(event)">Se formål og innstillinger for rutine</a>.</p>';
     });
 
     onValue(historyRef, (snapshot) => {
