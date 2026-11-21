@@ -65,7 +65,12 @@
       cursor: pointer;
     }
     #userName { font-weight: 700; color: #0369a1; }
-    #pinInput { font-weight: 400; color: #0369a1; }
+    #pinInput { 
+      font-weight: 400; 
+      color: #0369a1; 
+      -webkit-text-security: disc;
+      text-security: disc;
+    }
     input::placeholder { color: #94a3b8; font-weight: 400; }
     input:focus { border-color: #64748b; }
     .saved-note { font-size: 13px; color: #15803d; margin-top: 8px; font-weight: 400; }
@@ -212,7 +217,7 @@
         </div>
         <div class="inner-box">
           <h3>PIN</h3>
-          <input type="password" id="pinInput" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="...">
+          <input type="text" id="pinInput" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="...">
           <div class="saved-note" id="pinNote"></div>
         </div>
       </div>
@@ -467,11 +472,6 @@
         }
         settingsBox.open = true;
         settingsBox.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        if (!user) {
-          nameInput.focus({ preventScroll: true });
-        } else {
-          pinInput.focus({ preventScroll: true });
-        }
         return;
       }
       nameInput.value = user;
