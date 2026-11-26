@@ -46,7 +46,7 @@
       flex-shrink: 0;
     }
     h2 { margin: 0 0 12px 0; font-size: 18px; font-weight: 700; color: #1e293b; }
-    input[type="text"], input[type="password"] { 
+    input[type="text"] { 
       width: 100%; 
       padding: 14px; 
       font-size: 16px;
@@ -165,21 +165,18 @@
     }
     details.card .info-text {
       margin-top: 12px;
+
+      /* Denne lager en lysegrå linje 
       padding-top: 12px;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid #e2e8f0; 
+      */
+
       font-size: 14px;
       line-height: 1.5;
       color: #334155;
     }
-    details.card .info-text ul {
-      margin: 0 0 14px 0;
-      padding-left: 20px;
-    }
-    details.card .info-text li {
-      margin-bottom: 6px;
-    }
-    details.card .info-text li:last-child {
-      margin-bottom: 0;
+    details.card .info-text p {
+      margin: 0 0 12px 0;
     }
     .inner-box {
       background: #f1f5f9;
@@ -211,22 +208,16 @@
   </div>
 
   <details class="card" id="settingsBox">
-    <summary><span>Formål og innstillinger</span></summary>
+    <summary><span>Hensikt og innstillinger</span></summary>
     <div class="info-text">
-      <p style="margin-top: 0; margin-bottom: 14px;"><strong>Formål med siden</strong></p>
-      <ul>
-        <li>Gi naboene samme info du selv besitter. Nemlig faktisk status etter at du har slått en sone på eller av.</li>
-        <li>Unngå at soner står på unødvendig lenge. Noen ganger ser man behovet på vei ut. Andre ganger glemmer man seg. Da vil naboer raskere kunne fange det opp og slå av igjen.</li>
-        <li>Slippe turen til bryterpanelet kun for å sjekke status.</li>
-        <li>Tar man likevel turen og finner avvik, påser man selvfølgelig at denne siden samsvarer med faktisk status, slik at info igjen blir til nytte for alle.</li>
-        <li>Alle registreringer gjøres naturligvis når man vet faktisk status med sikkerhet. Glemmer man å registrere en endring kan andre ha endret noe i mellomtiden. Da må man ta turen opp igjen før man registrerer en eventuell endring.</li>
-      </ul>
+      <p>Gi naboene samme info du selv besitter. Nemlig faktisk status etter at du har slått en sone på eller av.</p>
+      <p>Unngå at soner står på unødvendig lenge. Noen ganger ser man behovet på vei ut. Andre ganger glemmer man seg. Da vil naboer raskere kunne fange det opp og slå av igjen.</p>
+      <p>Slippe turen til bryterpanelet kun for å sjekke status.</p>
+      <p>Tar man likevel turen og finner avvik, påser man selvfølgelig at denne siden samsvarer med faktisk status, slik at info igjen blir til nytte for alle.</p>
+      <p>Alle registreringer gjøres naturligvis når man vet faktisk status med sikkerhet. Glemmer man å registrere en endring kan andre ha endret noe i mellomtiden. Da må man ta turen opp igjen før man registrerer en eventuell endring.</p>
+      <p>Faktiske endringer i selve bryterpanelet (eller retting av avvik) <strong>skal</strong> altså registreres over og krever at fornavn og PIN oppgis;</p>
 
-      <p style="margin-top: 0; margin-bottom: 14px;">
-        Faktiske endringer i selve bryterpanelet (eller retting av avvik) <strong>skal</strong> altså registreres over og krever at fornavn og PIN oppgis;
-      </p>
-
-      <div class="bottom-grid" style="margin-bottom: 14px;">
+      <div class="bottom-grid">
         <div class="inner-box">
           <h3>Fornavn</h3>
           <input type="text" id="userName" maxlength="15" autocomplete="off" placeholder="...">
@@ -239,8 +230,8 @@
         </div>
       </div>
 
-      <p style="margin-top: 0; margin-bottom: 0;">
-        Fornavn (og PIN) kan senere endres, men det som sist er oppgitt vil huskes i nettleseren.
+      <p style="margin-bottom: 0;">
+        Bruk kun fornavn for enklere visning. Kan (sammen med PIN) senere endres, men det som sist er oppgitt vil huskes i nettleseren.
       </p>
 
     </div>
