@@ -94,8 +94,8 @@
     .btn-inactive { background: #94a3b8; color: #f8fafc; }
     .log-card {
       flex: 0 1 auto;
-      min-height: 98px; /*antar/legger alltid inn minst en historie linje (for liggende mobilskjerm visning)*/
-      padding-bottom: 25px; /* 7px ekstra (fra standard 18px) luft under listen for rent linjekutt - må også øke min-height og max-height tilsvarende */
+      min-height: 99px; /*antar/legger alltid inn minst en historie linje (for liggende mobilskjerm visning)*/
+      padding-bottom: 26px; /* 8px ekstra (fra standard 18px) luft under listen for rent linjekutt - må også øke min-height og max-height tilsvarende */
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -109,7 +109,7 @@
       overflow-y: auto; 
     }
     body:has(#settingsBox[open]) .log-card {
-      max-height: 163px; /* dersom 163px funker skal alle til høyre økes med 7 - 156px = 4 linjer, 177px = 5 linjer, 198px = 6 linjer */
+      max-height: 164px; /* dersom 164px funker skal alle til høyre økes med 8 - 156px = 4 linjer, 177px = 5 linjer, 198px = 6 linjer */
     }
     .log-item { 
       padding: 0; 
