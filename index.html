@@ -108,19 +108,23 @@
       overflow-y: auto; 
     }
     body:has(#settingsBox[open]) .log-card {
-      max-height: 184px;
+      max-height: 156px; /* 156px = 4 linjer, 177px = 5 linjer, 198px = 6 linjer */
     }
     .log-item { 
-      padding: 4px 0; 
+      padding: 0; 
+      margin-bottom: -1px; /* Kompenserer for den 1px tykke streken */
       border-bottom: 1px solid #e2e8f0; 
       font-size: 14px; 
-      line-height: 1.4;
+      line-height: 1.5; /* Matcher linjeavstanden i innstillingene (21px) */
       display: grid;
       grid-template-columns: 1fr auto 96px;
       align-items: baseline;
       gap: 12px;
     }
-    .log-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .log-item:last-child { 
+      border-bottom: none; 
+      margin-bottom: 0; /* Nullstiller på siste linje */
+    }
     .text-on { color: #16a34a; font-weight: 400; }
     .text-off { color: #dc2626; font-weight: 400; }
     .log-user { 
