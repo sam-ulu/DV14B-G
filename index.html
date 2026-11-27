@@ -34,9 +34,9 @@
       gap: 16px;
       color: #0f172a; 
     }
-    /* Gammel: body:has(#settingsBox[open]) */
     body.settings-open {
       height: auto;
+      padding-bottom: calc(16px + var(--safari-bottom-bar, 0px));
     }
 
     .bottom-grid {
@@ -210,7 +210,7 @@
     }
     #settingsBox {
       scroll-margin-top: 16px;
-      scroll-margin-bottom: 24px;
+      scroll-margin-bottom: calc(24px + var(--safari-bottom-bar, 0px));
       margin-bottom: 8px; /* Løfter nederste boks opp fra bunnen av siden, også linjen over ble derfor økt fra 16px til 24px */
     }
 
@@ -459,14 +459,35 @@
 
     const settingsBox = document.getElementById('settingsBox');
 
-    function scrollToSettings(forceBottom = false) {
-      const rect = settingsBox.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const fitsOnScreen = (rect.height + 32) <= viewportHeight;
+    function updateSafariBottomBarHeight() {
+      const probe = document.createElement('div');
+      probe.style.cssText = 'position:fixed; top:0; height:100dvh; width:0; pointer-events:none; visibility:hidden;';
+      document.body.appendChild(probe);
+      const dvhHeight = probe.getBoundingClientRect().height;
+      probe.remove();
 
-      settingsBox.scrollIntoView({
-        behavior: 'smooth',
-        block: (forceBottom || fitsOnScreen) ? 'end' : 'start'
+      const barHeight = Math.max(0, Math.round(window.innerHeight - dvhHeight));
+      document.documentElement.style.setProperty('--safari-bottom-bar', `${barHeight}px`);
+    }
+
+    updateSafariBottomBarHeight();
+    window.addEventListener('resize', updateSafariBottomBarHeight);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updateSafariBottomBarHeight);
+    }
+
+    function scrollToSettings(forceBottom = false) {
+      updateSafariBottomBarHeight();
+      requestAnimationFrame(() => {
+        const rect = settingsBox.getBoundingClientRect();
+        const barHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safari-bottom-bar')) || 0;
+        const usableHeight = window.innerHeight - barHeight;
+        const fitsOnScreen = (rect.height + 32) <= usableHeight;
+
+        settingsBox.scrollIntoView({
+          behavior: 'smooth',
+          block: (forceBottom || fitsOnScreen) ? 'end' : 'start'
+        });
       });
     }
 
@@ -502,10 +523,6 @@
         return;
       }
 
-/*
-    nameInput.value = user;
-      localStorage.setItem('zoneBoardUserName', user);
-*/
       const nowMs = Date.now();
       const timestamp = formatDateTime();
       const zoneName = defaultZones[zoneKey].zonename;
