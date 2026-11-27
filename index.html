@@ -33,16 +33,6 @@
       height: auto;
     }
 
-    /* På liggende mobilskjerm (lav høyde): la siden utvide seg så bunn-luft alltid vises */
-    @media (orientation: landscape) and (max-height: 500px) {
-      body {
-        height: auto;
-      }
-      .log-card {
-        max-height: 135px; /* Begrenser loggen til f.eks. 4 linjer også i liggende visning */
-      }
-    }
-
     .bottom-grid {
       display: grid;
       grid-template-columns: 1.4fr 1fr;
@@ -107,7 +97,7 @@
     .btn-inactive { background: #94a3b8; color: #f8fafc; }
     .log-card {
       flex: 0 1 auto;
-      min-height: 135px; /* antar/legger alltid inn minst en tre historie linje (for liggende mobilskjerm visning)*/
+      min-height: 135px; /* antar/legger alltid inn minst tre historie linjer (for liggende mobilskjerm visning)*/
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -211,6 +201,15 @@
       scroll-margin-bottom: 24px;
       margin-bottom: 8px; /* Løfter nederste boks opp fra bunnen av siden, også linjen over ble derfor økt fra 16px til 24px */
     }
+
+    /* På liggende mobilskjerm (lav høyde): la siden utvide seg så bunn-luft alltid vises */
+    @media (orientation: landscape) and (max-height: 500px) {
+      body {
+        height: auto;
+      }
+      .log-card {
+        max-height: 135px; /* Begrenser loggen til f.eks. 3 linjer også i liggende visning */
+      }
     }
   </style>
 </head>
