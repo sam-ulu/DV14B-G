@@ -36,7 +36,7 @@
     }
     body.settings-open {
       height: auto;
-      padding-bottom: calc(16px + var(--safari-bottom-bar, 0px));
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
     }
 
     .bottom-grid {
@@ -208,10 +208,20 @@
       font-size: 15px;
       color: #1e293b;
     }
+
     #settingsBox {
       scroll-margin-top: 16px;
-      scroll-margin-bottom: calc(24px + var(--safari-bottom-bar, 0px));
+      scroll-margin-bottom: calc(24px + env(safe-area-inset-bottom));
       margin-bottom: 8px; /* Løfter nederste boks opp fra bunnen av siden, også linjen over ble derfor økt fra 16px til 24px */
+    }
+
+    @media (display-mode: browser) and (max-width: 600px) {
+      body.settings-open {
+        padding-bottom: calc(64px + env(safe-area-inset-bottom));
+      }
+      #settingsBox {
+        scroll-margin-bottom: calc(64px + env(safe-area-inset-bottom));
+      }
     }
 
     /* På liggende mobilskjerm (lav høyde): la siden utvide seg så bunn-luft alltid vises */
@@ -459,30 +469,11 @@
 
     const settingsBox = document.getElementById('settingsBox');
 
-    function updateSafariBottomBarHeight() {
-      const probe = document.createElement('div');
-      probe.style.cssText = 'position:fixed; top:0; height:100dvh; width:0; pointer-events:none; visibility:hidden;';
-      document.body.appendChild(probe);
-      const dvhHeight = probe.getBoundingClientRect().height;
-      probe.remove();
-
-      const barHeight = Math.max(0, Math.round(window.innerHeight - dvhHeight));
-      document.documentElement.style.setProperty('--safari-bottom-bar', `${barHeight}px`);
-    }
-
-    updateSafariBottomBarHeight();
-    window.addEventListener('resize', updateSafariBottomBarHeight);
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', updateSafariBottomBarHeight);
-    }
-
     function scrollToSettings(forceBottom = false) {
-      updateSafariBottomBarHeight();
       requestAnimationFrame(() => {
         const rect = settingsBox.getBoundingClientRect();
-        const barHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safari-bottom-bar')) || 0;
-        const usableHeight = window.innerHeight - barHeight;
-        const fitsOnScreen = (rect.height + 32) <= usableHeight;
+        const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        const fitsOnScreen = (rect.height + 32) <= viewportHeight;
 
         settingsBox.scrollIntoView({
           behavior: 'smooth',
