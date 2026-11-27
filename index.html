@@ -466,8 +466,9 @@
         const fitsOnScreen = (rect.height + 32) <= viewportHeight;
 
         if (forceBottom || fitsOnScreen) {
+          const maxBottom = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
           window.scrollTo({
-            top: document.documentElement.scrollHeight,
+            top: maxBottom,
             behavior: 'smooth'
           });
         } else {
@@ -478,10 +479,14 @@
         }
       };
 
-      doScroll();
-      if (forceBottom) {
-        setTimeout(doScroll, 350);
-      }
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          doScroll();
+          if (forceBottom && window.matchMedia('(display-mode: browser)').matches) {
+            setTimeout(doScroll, 350);
+          }
+        });
+      });
     }
 
     settingsBox.addEventListener('toggle', () => {
