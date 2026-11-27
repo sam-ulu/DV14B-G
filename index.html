@@ -260,8 +260,11 @@
         </div>
       </div>
 
-      <p style="margin-bottom: 0;">
+      <p>
         Bruk kun fornavn for enklere visning. Kan (sammen med PIN) senere endres, men det som sist er oppgitt vil huskes i nettleseren.
+      </p>
+      <p style="margin-bottom: 0;">
+	Ved registrering lagres også grunnleggende enhetsinfo for å hindre misbruk.
       </p>
 
     </div>
@@ -569,21 +572,29 @@
         }
       });
       entries.reverse();
-      logContainer.innerHTML = entries.map(item => {
-        const isOn = item.status === "ON";
-        const zoneText = String(item.zonename || item.zone || 'Sone');
-        const userText = String(item.user || 'Ukjent');
-        const timeText = String(item.time || '');
-        return `
-          <li class="log-item">
-            <span class="${isOn ? 'text-on' : 'text-off'}">${zoneText}</span>
-            <span class="log-user">${userText}</span>
-            <span class="log-time">${timeText}</span>
-          </li>`;
-      }).join('');
-    }, (error) => {
+      logContainer.innerHTML = '';
+      entries.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'log-item';
+
+        const zoneSpan = document.createElement('span');
+        zoneSpan.className = item.status === 'ON' ? 'text-on' : 'text-off';
+        zoneSpan.textContent = String(item.zonename || item.zone || 'Sone');
+
+        const userSpan = document.createElement('span');
+        userSpan.className = 'log-user';
+        userSpan.textContent = String(item.user || 'Ukjent');
+
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'log-time';
+        timeSpan.textContent = String(item.time || '');
+
+        li.append(zoneSpan, userSpan, timeSpan);
+        logContainer.appendChild(li);
+      });
+    }, () => {
       const logContainer = document.getElementById('activityLog');
-      logContainer.innerHTML = `<li class="log-item" style="color: #dc2626; font-weight: bold;">Firebase-feil: ${error.message}</li>`;
+      logContainer.innerHTML = '<li class="log-item" style="color: #dc2626;">Kunne ikke laste historikk.</li>';
     });
 
   </script>
