@@ -460,14 +460,28 @@
     const settingsBox = document.getElementById('settingsBox');
 
     function scrollToSettings(forceBottom = false) {
-      const rect = settingsBox.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const fitsOnScreen = (rect.height + 32) <= viewportHeight;
+      const doScroll = () => {
+        const rect = settingsBox.getBoundingClientRect();
+        const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        const fitsOnScreen = (rect.height + 32) <= viewportHeight;
 
-      settingsBox.scrollIntoView({
-        behavior: 'smooth',
-        block: (forceBottom || fitsOnScreen) ? 'end' : 'start'
-      });
+        if (forceBottom || fitsOnScreen) {
+          window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: 'smooth'
+          });
+        } else {
+          settingsBox.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      };
+
+      doScroll();
+      if (forceBottom) {
+        setTimeout(doScroll, 350);
+      }
     }
 
     settingsBox.addEventListener('toggle', () => {
