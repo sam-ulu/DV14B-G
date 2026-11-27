@@ -119,6 +119,8 @@
       flex: 1;
       min-height: 0;
       overflow-y: auto; 
+      overflow-x: hidden;
+      overscroll-behavior-x: none;
     }
     body.settings-open .log-card {
       max-height: 136px; /* 136px = 3 linjer, 157px = 4 linjer, 178px = 5 linjer, 199px = 6 linjer */
@@ -130,7 +132,7 @@
       font-size: 14px; 
       line-height: 1.5; /* Matcher linjeavstanden i innstillingene (21px) */
       display: grid;
-      grid-template-columns: 1fr auto 96px;
+      grid-template-columns: 1fr minmax(0, auto) 96px;
       align-items: baseline;
       gap: 12px;
     }
