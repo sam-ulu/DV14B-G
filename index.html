@@ -34,7 +34,8 @@
       gap: 16px;
       color: #0f172a; 
     }
-    body:has(#settingsBox[open]) {
+    /* Gammel: body:has(#settingsBox[open]) */
+    body.settings-open {
       height: auto;
     }
 
@@ -80,7 +81,6 @@
       font-weight: 400; 
       color: #0369a1; 
       -webkit-text-security: disc;
-      text-security: disc;
     }
     input::placeholder { color: #94a3b8; font-weight: 400; }
     input:focus { border-color: #64748b; }
@@ -121,7 +121,8 @@
       min-height: 0;
       overflow-y: auto; 
     }
-    body:has(#settingsBox[open]) .log-card {
+    /* Gammel: body:has(#settingsBox[open]) .log-card */
+    body.settings-open .log-card {
       max-height: 136px; /* 136px = 3 linjer, 157px = 4 linjer, 178px = 5 linjer, 199px = 6 linjer */
     }
     .log-item { 
@@ -430,32 +431,6 @@
       return `${datePart} kl. ${timePart}`;
     }
 
-    function parseLegacyTime(timeStr) {
-      if (!timeStr) return null;
-      const match = timeStr.match(/(\d+)\.\s*([a-zæøå]+)\.?\s*kl\.\s*(\d{2}):(\d{2})/i);
-      if (!match) return null;
-      const months = {
-        jan: 0, feb: 1, mar: 2, apr: 3, mai: 4, jun: 5,
-        jul: 6, aug: 7, sep: 8, okt: 9, nov: 10, des: 11
-      };
-      const monthPart = match.at(2);
-      if (!monthPart) return null;
-      const monthKey = monthPart.toLowerCase().slice(0, 3);
-      if (months[monthKey] === undefined) return null;
-      const now = new Date();
-      let candidate = new Date(
-        now.getFullYear(),
-        months[monthKey],
-        parseInt(match.at(1), 10),
-        parseInt(match.at(3), 10),
-        parseInt(match.at(4), 10)
-      );
-      if (candidate.getTime() > now.getTime() + 86400000) {
-        candidate.setFullYear(now.getFullYear() - 1);
-      }
-      return candidate.getTime();
-    }
-
     function formatElapsed(timestampMs) {
       if (!timestampMs) return "";
       const diffMs = Math.max(0, Date.now() - timestampMs);
@@ -478,7 +453,7 @@
       });
     }
 
-    setInterval(refreshElapsedTimers, 60000);
+    setInterval(refreshElapsedTimers, 15000);
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) refreshElapsedTimers();
     });
@@ -497,6 +472,7 @@
     }
 
     settingsBox.addEventListener('toggle', () => {
+      document.body.classList.toggle('settings-open', settingsBox.open);
       if (settingsBox.open && !settingsBox.dataset.skipToggleScroll) {
         scrollToSettings(false);
       }
@@ -527,8 +503,10 @@
         return;
       }
 
-      nameInput.value = user;
+/*
+    nameInput.value = user;
       localStorage.setItem('zoneBoardUserName', user);
+*/
       const nowMs = Date.now();
       const timestamp = formatDateTime();
       const zoneName = defaultZones[zoneKey].zonename;
@@ -559,7 +537,7 @@
       Object.keys(defaultZones).forEach((key) => {
         const z = data[key] || defaultZones[key];
         const isOn = z.status === "ON";
-        const ts = isOn ? (z.updatedAt || parseLegacyTime(z.time) || "") : "";
+        const ts = isOn ? (z.updatedAt || "") : "";
         const elapsedHtml = (isOn && ts)
           ? `<span class="zone-elapsed" data-ts="${ts}">${formatElapsed(ts)}</span>`
           : '';
