@@ -20,15 +20,17 @@
       margin: 0 auto; 
       padding: 16px; 
       background-color: #cbd5e1;
-      height: 100dvh;
+      /* height: 100dvh;  <-- Fjern eller kommenter ut denne! */
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
       gap: 16px;
       color: #0f172a; 
     }
-    body:has(#settingsBox[open]) {
-      height: auto;
+/*
+      body:has(#settingsBox[open]) {
+      height: auto; 
+*/
     }
     .bottom-grid {
       display: grid;
