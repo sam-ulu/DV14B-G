@@ -14,24 +14,35 @@
 
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    /* Beholder dagens oppsett på stående mobil og PC */
     body { 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
       max-width: 540px; 
       margin: 0 auto; 
       padding: 16px; 
       background-color: #cbd5e1;
-      /* height: 100dvh;  <-- Fjern eller kommenter ut denne! */
+      height: 100dvh;
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
       gap: 16px;
       color: #0f172a; 
     }
-/*
-      body:has(#settingsBox[open]) {
-      height: auto; 
+    body:has(#settingsBox[open]) {
+      height: auto;
     }
-*/
+
+    /* På liggende mobilskjerm (lav høyde): la siden utvide seg så bunn-luft alltid vises */
+    @media (orientation: landscape) and (max-height: 500px) {
+      body {
+        height: auto;
+      }
+      .log-card {
+/*        max-height: 153px; */ /* Begrenser loggen til f.eks. 4 linjer også i liggende visning */
+      }
+    }
+
     .bottom-grid {
       display: grid;
       grid-template-columns: 1.4fr 1fr;
