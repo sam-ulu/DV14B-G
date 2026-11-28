@@ -132,23 +132,28 @@
       font-size: 14px; 
       line-height: 1.5; /* Matcher linjeavstanden i innstillingene (21px) */
       display: grid;
-      grid-template-columns: 1fr minmax(0, auto) 76px;
+      grid-template-columns: 56px 58px minmax(0, 1fr) 74px;
       align-items: baseline;
-      gap: 12px;
+      gap: 8px;
     }
     .log-item:last-child { 
       border-bottom: none; 
       margin-bottom: 0; /* Nullstiller på siste linje */
     }
-    .text-on { color: #16a34a; font-weight: 400; }
-    .text-off { color: #dc2626; font-weight: 400; }
+    .text-on { color: #16a34a; font-weight: 400; white-space: nowrap; }
+    .text-off { color: #dc2626; font-weight: 400; white-space: nowrap; }
+    .log-duration {
+      color: #64748b;
+      font-size: 12px;
+      text-align: right;
+      white-space: nowrap;
+    }
     .log-user { 
       color: #64748b; 
       font-weight: 400; 
       text-align: right;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
     }
     .log-time { 
       color: #64748b; 
@@ -581,6 +586,32 @@
           entries.push(val);
         }
       });
+
+      const lastOnByZone = {};
+      entries.forEach(item => {
+        const zName = String(item.zonename || item.zone || 'Sone');
+        if (item.status === 'ON' && item.updatedAt) {
+          lastOnByZone[zName] = Number(item.updatedAt);
+        } else if (item.status === 'OFF' && item.updatedAt && lastOnByZone[zName]) {
+          const diffMs = Math.max(0, Number(item.updatedAt) - lastOnByZone[zName]);
+          const totalMins = Math.floor(diffMs / 60000);
+          if (totalMins < 60) {
+            item._durationText = `${totalMins} min`;
+          } else {
+            const hours = Math.floor(totalMins / 60);
+            const mins = totalMins % 60;
+            if (hours < 24) {
+              item._durationText = mins > 0 ? `${hours} t ${mins} min` : `${hours} t`;
+            } else {
+              const days = Math.floor(hours / 24);
+              const remHours = hours % 24;
+              item._durationText = remHours > 0 ? `${days} d ${remHours} t` : `${days} d`;
+            }
+          }
+          delete lastOnByZone[zName];
+        }
+      });
+
       entries.reverse();
       logContainer.innerHTML = '';
       entries.forEach(item => {
@@ -591,6 +622,10 @@
         zoneSpan.className = item.status === 'ON' ? 'text-on' : 'text-off';
         zoneSpan.textContent = String(item.zonename || item.zone || 'Sone');
 
+        const durSpan = document.createElement('span');
+        durSpan.className = 'log-duration';
+        durSpan.textContent = item._durationText || '';
+
         const userSpan = document.createElement('span');
         userSpan.className = 'log-user';
         userSpan.textContent = String(item.user || 'Ukjent');
@@ -599,7 +634,7 @@
         timeSpan.className = 'log-time';
         timeSpan.textContent = String(item.time || '');
 
-        li.append(zoneSpan, userSpan, timeSpan);
+        li.append(zoneSpan, durSpan, userSpan, timeSpan);
         logContainer.appendChild(li);
       });
     }, () => {
