@@ -60,6 +60,12 @@
       font-weight: 700; 
       color: #1e293b; 
     }
+    #zonesContainer h2 {
+      cursor: default;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
     input[type="text"] { 
       width: 100%; 
       padding: 14px; 
@@ -231,7 +237,7 @@
 </head>
 <body>
   <div class="card" id="zonesContainer">
-    <h2 onclick="forceHardReload()" style="cursor: pointer;">Varmekabler tilfartsvei</h2>
+    <h2 onclick="handleHeadingTap()">Varmekabler tilfartsvei</h2>
     <p class="loading-text">Laster inn soner...</p>
   </div>
   <div class="card log-card">
@@ -297,10 +303,15 @@
     const pinNote = document.getElementById('pinNote');
     const accessPin = "0776";
 
-    window.forceHardReload = function() {
-      const url = new URL(window.location.href);
-      url.searchParams.set('v', Date.now());
-      window.location.replace(url.toString());
+    let lastHeadingTap = 0;
+    window.handleHeadingTap = function() {
+      const now = Date.now();
+      if (now - lastHeadingTap < 400) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('v', now);
+        window.location.replace(url.toString());
+      }
+      lastHeadingTap = now;
     };
 
     function getOrCreateDeviceId() {
@@ -557,7 +568,7 @@
       const data = snapshot.val() || defaultZones;
       currentZonesData = data;
       const container = document.getElementById('zonesContainer');
-      container.innerHTML = '<h2 onclick="forceHardReload()" style="cursor: pointer;">Varmekabler tilfartsvei</h2>';
+      container.innerHTML = '<h2 onclick="handleHeadingTap()">Varmekabler tilfartsvei</h2>';
       Object.keys(defaultZones).forEach((key) => {
         const z = data[key] || defaultZones[key];
         const isOn = z.status === "ON";
