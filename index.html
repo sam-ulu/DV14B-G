@@ -231,10 +231,10 @@
 </head>
 <body>
   <div class="card" id="zonesContainer">
-    <h2>Varmekabler tilfartsvei</h2>
+    <h2 onclick="forceHardReload()" style="cursor: pointer;">Varmekabler tilfartsvei</h2>
     <p class="loading-text">Laster inn soner...</p>
   </div>
-    <div class="card log-card">
+  <div class="card log-card">
     <h2>Historikk</h2>
     <ul class="log-list" id="activityLog">
       <li class="loading-text">Laster inn historikk...</li>
@@ -296,6 +296,12 @@
     const pinInput = document.getElementById('pinInput');
     const pinNote = document.getElementById('pinNote');
     const accessPin = "0776";
+
+    window.forceHardReload = function() {
+      const url = new URL(window.location.href);
+      url.searchParams.set('v', Date.now());
+      window.location.replace(url.toString());
+    };
 
     function getOrCreateDeviceId() {
       let id = localStorage.getItem('zoneBoardDeviceId');
@@ -551,7 +557,7 @@
       const data = snapshot.val() || defaultZones;
       currentZonesData = data;
       const container = document.getElementById('zonesContainer');
-      container.innerHTML = '<h2>Varmekabler tilfartsvei</h2>';
+      container.innerHTML = '<h2 onclick="forceHardReload()" style="cursor: pointer;">Varmekabler tilfartsvei</h2>';
       Object.keys(defaultZones).forEach((key) => {
         const z = data[key] || defaultZones[key];
         const isOn = z.status === "ON";
